@@ -8,6 +8,19 @@
     <artifactId>eden</artifactId>
     <version>0.1</version>
 
+    <properties>
+        <maven.compiler.source>1.10</maven.compiler.source>
+        <maven.compiler.target>1.10</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.0.4-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 
 </project>
