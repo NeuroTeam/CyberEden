@@ -1,6 +1,8 @@
 package com.dekinci.eden.gui;
 
 import com.dekinci.eden.model.world.World;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -8,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.StackPane;
 
@@ -34,10 +37,10 @@ public class MainController {
     Button saveButton;
 
     @FXML
-    Slider sizeSlider;
+    Slider sizeSlider, thresholdSlider, powerSlider, distanceCSlider;
 
     @FXML
-    Label sizeLabel;
+    Label sizeLabel, thresholdLabel, powerLabel, distanceLabel;
 
     private final AtomicReference<Image> finalImage = new AtomicReference<>();
 
@@ -45,6 +48,15 @@ public class MainController {
     public void initialize() {
         sizeSlider.valueProperty().addListener((observable, oldValue, newValue) ->
                 sizeLabel.setText(String.valueOf((int) (double) newValue)));
+
+        thresholdSlider.valueProperty().addListener((observable, oldValue, newValue) ->
+                thresholdLabel.setText(String.format("%2.2f", (double) newValue)));
+
+        powerSlider.valueProperty().addListener((observable, oldValue, newValue) ->
+                powerLabel.setText(String.format("%2.2f", (double) newValue)));
+
+        distanceCSlider.valueProperty().addListener((observable, oldValue, newValue) ->
+                distanceLabel.setText(String.format("%2.2f", (double) newValue)));
 
         saveButton.setOnMouseClicked(event -> {
             new Thread(() -> {
@@ -58,7 +70,6 @@ public class MainController {
                         int h = before.getHeight();
                         BufferedImage result = before;
                         if (w < MIN_SIZE || h < MIN_SIZE) {
-//                            BufferedImage after = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
                             AffineTransform at = new AffineTransform();
                             at.scale(MIN_SIZE / w, MIN_SIZE / h);
                             AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
@@ -77,17 +88,21 @@ public class MainController {
         generate.setOnMouseClicked(event -> {
             worldPane.getChildren().clear();
             int size = (int) sizeSlider.getValue();
+            double threshold = thresholdSlider.getValue();
+            double power = powerSlider.getValue();
+            double dc = distanceCSlider.getValue();
 
-            var image = new WritableImage(size, size);
-            var iv = new ImageView(image);
+
+            WritableImage image = new WritableImage(size, size);
+            ImageView iv = new ImageView(image);
             iv.fitWidthProperty().bind(worldPane.widthProperty());
             iv.fitHeightProperty().bind(worldPane.heightProperty());
             worldPane.getChildren().add(iv);
 
-            var pw = image.getPixelWriter();
+            PixelWriter pw = image.getPixelWriter();
 
             new Thread(() -> {
-                World world = new World.Generator().generate(size);
+                World world = new World.Generator().generate(size, threshold, power, dc);
                 world.forEach((pos, chunk) -> pw.setColor(pos.getX() + size / 2, pos.getY() + size / 2,
                         BlockColor.blockColor[chunk.getId()]));
                 finalImage.set(image);
