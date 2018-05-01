@@ -1,7 +1,7 @@
 package com.dekinci.eden.model.world.chunk;
 
 public abstract class Chunk {
-    public static final int SIZE = 16;
+    public static final int SIZE = 64;
 
     private byte[] blocks = new byte[SIZE * SIZE];
 

@@ -68,7 +68,7 @@
                               </Label>
                            </children>
                         </HBox>
-                        <Slider fx:id="sizeSlider" blockIncrement="1.0" majorTickUnit="100.0" max="1000.0" min="10.0" showTickMarks="true" snapToTicks="true">
+                        <Slider fx:id="sizeSlider" blockIncrement="1.0" majorTickUnit="100.0" max="2500.0" min="10.0" showTickMarks="true" snapToTicks="true">
                            <VBox.margin>
                               <Insets left="5.0" right="5.0" />
                            </VBox.margin>

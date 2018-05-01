@@ -56,38 +56,7 @@ public class MainController {
 
         genType.expandedPaneProperty().setValue(defaultGenType);
 
-        saveButton.setOnMouseClicked(event -> {
-            new Thread(() -> {
-                saveButton.setDisable(true);
-                saveButton.setText("SAVING...");
-                if (finalImage.get() != null) {
-                    Path path = Paths.get("imges/" + (System.currentTimeMillis() / 1000 % 10000000) + ".png");
-                    try {
-                        Files.createFile(path);
-
-                        BufferedImage before = SwingFXUtils.fromFXImage(finalImage.get(), null);
-                        int w = before.getWidth();
-                        int h = before.getHeight();
-                        BufferedImage result = before;
-                        if (w < MIN_SIZE || h < MIN_SIZE) {
-                            AffineTransform at = new AffineTransform();
-                            at.scale(MIN_SIZE / w, MIN_SIZE / h);
-                            AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-                            result = scaleOp.filter(before, null);
-                        }
-
-                        ImageIO.write(result, "png", path.toFile());
-                        finalImage.set(null);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        saveButton.setText("SAVE");
-                        saveButton.setDisable(false);
-                    }
-                }
-            }).start();
-        });
-
+        saveButton.setOnMouseClicked(event -> new SaveHandler().execute());
         generate.setOnMouseClicked(event -> new GenerationHandler().execute());
     }
 
@@ -149,6 +118,47 @@ public class MainController {
         @Override
         public void progressCallback(String... params) {
             progress.setText(params[0]);
+        }
+    }
+
+    private class SaveHandler extends AsyncTask<Void, String, Void> {
+        @Override
+        public void onPreExecute() {
+            saveButton.setDisable(true);
+            saveButton.setText("SAVING...");
+        }
+
+        @Override
+        public Void doInBackground(Void... voids) {
+            if (finalImage.get() != null) {
+                Path path = Paths.get("imges/" + (System.currentTimeMillis() / 1000 % 10000000) + ".png");
+                try {
+                    Files.createFile(path);
+
+                    BufferedImage before = SwingFXUtils.fromFXImage(finalImage.get(), null);
+                    int w = before.getWidth();
+                    int h = before.getHeight();
+                    BufferedImage result = before;
+                    if (w < MIN_SIZE || h < MIN_SIZE) {
+                        AffineTransform at = new AffineTransform();
+                        at.scale(MIN_SIZE / w, MIN_SIZE / h);
+                        AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+                        result = scaleOp.filter(before, null);
+                    }
+
+                    ImageIO.write(result, "png", path.toFile());
+                    finalImage.set(null);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public void onPostExecute(Void params) {
+            saveButton.setText("SAVE");
+            saveButton.setDisable(false);
         }
     }
 }

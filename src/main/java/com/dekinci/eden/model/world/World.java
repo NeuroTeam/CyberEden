@@ -1,6 +1,5 @@
 package com.dekinci.eden.model.world;
 
-import com.dekinci.eden.model.utils.Callback;
 import com.dekinci.eden.model.utils.FactCallback;
 import com.dekinci.eden.model.world.chunk.Chunk;
 import com.dekinci.eden.model.world.chunk.EmptyChunk;
