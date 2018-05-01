@@ -22,7 +22,7 @@ public class World {
 
     @Override
     public String toString() {
-        var builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
 
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++)
@@ -49,24 +49,24 @@ public class World {
         public Generator(long seed) {
         }
 
-        public World generate(int size) {
-            var world = new World(size);
+        public World generate(int size, double threshold, double power, double distanceCoeff) {
+            World world = new World(size);
 
             this.size = size;
             center = size / 2;
             sqradius = center * center;
 
-            var emptyFactory = new EmptyChankFactory();
+            EmptyChankFactory emptyFactory = new EmptyChankFactory();
             fill(world, (x, y) -> emptyFactory.create());
 
-            var portalFactory = new PortalChunkFactory();
+            PortalChunkFactory portalFactory = new PortalChunkFactory();
             fill(world, (x, y) -> Math.round(Math.sqrt(x * x + y * y)) == center ? portalFactory.create() : null);
 
-            var oceanFactory = new WaterChunkFactory();
+            WaterChunkFactory oceanFactory = new WaterChunkFactory();
             fill(world, (x, y) -> Math.round(Math.sqrt(x * x + y * y)) < center ? oceanFactory.create() : null);
 
-            var landFactory = new EarthChunkFactory();
-            sparse(0.4, world, new Coordinate(0, 0), landFactory);
+            EarthChunkFactory landFactory = new EarthChunkFactory();
+            sparse(threshold, power, distanceCoeff, world, new Coordinate(0, 0), landFactory);
 
             return world;
         }
@@ -74,13 +74,13 @@ public class World {
         private void fill(World world, BiFunction<Integer, Integer, Chunk> function) {
             for (int i = 0; i < size; i++)
                 for (int j = 0; j < size; j++) {
-                    var result = function.apply(i - center, j - center);
+                    Chunk result = function.apply(i - center, j - center);
                     if (result != null)
                         world.chunkMap.put(new Coordinate(i - center, j - center), result);
                 }
         }
 
-        private void sparse(double size, World world, Coordinate start, ChunkFactory factory) {
+        private void sparse(double size, double power, double distance, World world, Coordinate start, ChunkFactory factory) {
             assert size >= 0.0 && size <= 1.0;
 
             Set<Coordinate> visited = new HashSet<>(world.size * world.size);
@@ -94,7 +94,7 @@ public class World {
                     continue;
                 visited.add(current);
                 world.chunkMap.put(current, factory.create());
-                double probability = Math.pow((1 - current.hypotenuse() / world.radius), 1.8) * 0.3;
+                double probability = Math.pow((1 - current.hypotenuse() / world.radius), power) * distance;
 
                 if (r.nextDouble() - probability < size &&
                         world.chunkMap.getOrDefault(Coordinate.downTo(current), new EmptyChunk()).getId() == WaterChunk.ID)
