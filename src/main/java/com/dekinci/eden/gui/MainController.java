@@ -1,13 +1,10 @@
 package com.dekinci.eden.gui;
 
+import com.dekinci.eden.model.utils.AsyncTask;
 import com.dekinci.eden.model.world.World;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
@@ -42,24 +39,27 @@ public class MainController {
     @FXML
     Label sizeLabel, thresholdLabel, powerLabel, distanceLabel;
 
+    @FXML
+    Accordion genType;
+    @FXML
+    TitledPane defaultGenType;
+
     private final AtomicReference<Image> finalImage = new AtomicReference<>();
 
     @FXML
     public void initialize() {
-        sizeSlider.valueProperty().addListener((observable, oldValue, newValue) ->
-                sizeLabel.setText(String.valueOf((int) (double) newValue)));
+        bindLabelAndSlider(100, "%.0f", sizeSlider, sizeLabel);
 
-        thresholdSlider.valueProperty().addListener((observable, oldValue, newValue) ->
-                thresholdLabel.setText(String.format("%2.2f", (double) newValue)));
+        bindLabelAndSlider(0.5, "%2.2f", thresholdSlider, thresholdLabel);
+        bindLabelAndSlider(1, "%2.2f", powerSlider, powerLabel);
+        bindLabelAndSlider(1, "%2.2f", distanceCSlider, distanceLabel);
 
-        powerSlider.valueProperty().addListener((observable, oldValue, newValue) ->
-                powerLabel.setText(String.format("%2.2f", (double) newValue)));
-
-        distanceCSlider.valueProperty().addListener((observable, oldValue, newValue) ->
-                distanceLabel.setText(String.format("%2.2f", (double) newValue)));
+        genType.expandedPaneProperty().setValue(defaultGenType);
 
         saveButton.setOnMouseClicked(event -> {
             new Thread(() -> {
+                saveButton.setDisable(true);
+                saveButton.setText("SAVING...");
                 if (finalImage.get() != null) {
                     Path path = Paths.get("imges/" + (System.currentTimeMillis() / 1000 % 10000000) + ".png");
                     try {
@@ -80,33 +80,75 @@ public class MainController {
                         finalImage.set(null);
                     } catch (IOException e) {
                         e.printStackTrace();
+                    } finally {
+                        saveButton.setText("SAVE");
+                        saveButton.setDisable(false);
                     }
                 }
             }).start();
         });
 
-        generate.setOnMouseClicked(event -> {
+        generate.setOnMouseClicked(event -> new GenerationHandler().execute());
+    }
+
+    private void bindLabelAndSlider(double def, String format, Slider slider, Label label) {
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            label.setText(String.format(format, (double) newValue));
+        });
+        slider.setValue(def);
+    }
+
+    private class GenerationHandler extends AsyncTask<Void, String, Image> {
+        private Label progress = new Label();
+
+        @Override
+        public void onPreExecute() {
+            generate.setDisable(true);
+
             worldPane.getChildren().clear();
+            worldPane.getChildren().add(progress);
+        }
+
+        @Override
+        public Image doInBackground(Void... voids) {
             int size = (int) sizeSlider.getValue();
             double threshold = thresholdSlider.getValue();
             double power = powerSlider.getValue();
             double dc = distanceCSlider.getValue();
 
-
+            publishProgress("Prepearing...");
             WritableImage image = new WritableImage(size, size);
+            PixelWriter pw = image.getPixelWriter();
+
+            World.Generator generator = new World.Generator(size);
+            World world = generator.getWorld();
+
+            publishProgress("Generating...");
+            generator.setCallback((w) -> {
+                publishProgress("Displaying...");
+                world.forEach((pos, chunk) -> pw.setColor(pos.getX() + size / 2, pos.getY() + size / 2,
+                        BlockColor.blockColor[chunk.getId()]));
+                publishProgress("Generating...");
+            }).preparePlanet().generateRandomEarth(threshold, power, dc);
+
+            return image;
+        }
+
+        @Override
+        public void onPostExecute(Image image) {
+            finalImage.set(image);
             ImageView iv = new ImageView(image);
             iv.fitWidthProperty().bind(worldPane.widthProperty());
             iv.fitHeightProperty().bind(worldPane.heightProperty());
             worldPane.getChildren().add(iv);
 
-            PixelWriter pw = image.getPixelWriter();
+            worldPane.getChildren().remove(progress);
+            generate.setDisable(false);
+        }
 
-            new Thread(() -> {
-                World world = new World.Generator().generate(size, threshold, power, dc);
-                world.forEach((pos, chunk) -> pw.setColor(pos.getX() + size / 2, pos.getY() + size / 2,
-                        BlockColor.blockColor[chunk.getId()]));
-                finalImage.set(image);
-            }).start();
-        });
+        @Override
+        public void progressCallback(String... params) {
+            progress.setText(params[0]);
+        }
     }
 }

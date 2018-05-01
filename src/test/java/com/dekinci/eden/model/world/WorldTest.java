@@ -18,7 +18,7 @@ class WorldTest {
 
     @Test
     void generateTest() {
-//        World world = new World.Generator().generate(21);
+//        World world = new World.Generator().generateRandom(21);
 //        System.out.println(world.toString());
     }
 }

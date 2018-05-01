@@ -1,5 +1,7 @@
 package com.dekinci.eden.model.world;
 
+import com.dekinci.eden.model.utils.Callback;
+import com.dekinci.eden.model.utils.FactCallback;
 import com.dekinci.eden.model.world.chunk.Chunk;
 import com.dekinci.eden.model.world.chunk.EmptyChunk;
 import com.dekinci.eden.model.world.chunk.WaterChunk;
@@ -38,37 +40,57 @@ public class World {
     }
 
     public static class Generator {
-        private int size = 0;
-        private int center = 0;
-        private int sqradius = 0;
+        private int size;
+        private int center;
+        private int sqradius;
+        World world;
+
+        private FactCallback callback;
 
 
-        public Generator() {
-        }
-
-        public Generator(long seed) {
-        }
-
-        public World generate(int size, double threshold, double power, double distanceCoeff) {
-            World world = new World(size);
-
+        public Generator(int size) {
             this.size = size;
             center = size / 2;
             sqradius = center * center;
+            world = new World(size);
+        }
 
+        public World getWorld() {
+            return world;
+        }
+
+        public Generator setCallback(FactCallback callback) {
+            this.callback = callback;
+            return this;
+        }
+
+        public Generator preparePlanet() {
             EmptyChankFactory emptyFactory = new EmptyChankFactory();
             fill(world, (x, y) -> emptyFactory.create());
+            update();
 
             PortalChunkFactory portalFactory = new PortalChunkFactory();
             fill(world, (x, y) -> Math.round(Math.sqrt(x * x + y * y)) == center ? portalFactory.create() : null);
+            update();
 
             WaterChunkFactory oceanFactory = new WaterChunkFactory();
             fill(world, (x, y) -> Math.round(Math.sqrt(x * x + y * y)) < center ? oceanFactory.create() : null);
+            update();
+            return this;
+        }
 
+        public Generator generateRoundEarth() {
+            EarthChunkFactory landFactory = new EarthChunkFactory();
+            fill(world, (x, y) -> Math.round(Math.sqrt(x * x + y * y)) < center - 1 ? landFactory.create() : null);
+            update();
+            return this;
+        }
+
+        public Generator generateRandomEarth(double threshold, double power, double distanceCoeff) {
             EarthChunkFactory landFactory = new EarthChunkFactory();
             sparse(threshold, power, distanceCoeff, world, new Coordinate(0, 0), landFactory);
-
-            return world;
+            update();
+            return this;
         }
 
         private void fill(World world, BiFunction<Integer, Integer, Chunk> function) {
@@ -112,6 +134,11 @@ public class World {
                         world.chunkMap.getOrDefault(Coordinate.leftTo(current), new EmptyChunk()).getId() == WaterChunk.ID)
                     queue.add(Coordinate.leftTo(current));
             }
+        }
+
+        private void update() {
+            if (callback != null)
+                callback.success();
         }
     }
 }
