@@ -15,6 +15,10 @@ public class World {
     private int size;
     private int radius;
 
+    public Chunk getChunk(Coordinate pos){
+        return chunkMap.get(pos);
+    }
+
     private World(int size) {
         this.size = size;
         radius = size / 2;
@@ -141,6 +145,9 @@ public class World {
         }
     }
 }
+
+
+
 
 /*
 

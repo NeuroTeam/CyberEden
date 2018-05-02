@@ -1,7 +1,9 @@
 package com.dekinci.eden.gui;
 
 import com.dekinci.eden.model.utils.AsyncTask;
+import com.dekinci.eden.model.world.Coordinate;
 import com.dekinci.eden.model.world.World;
+import com.dekinci.eden.model.world.chunk.Chunk;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -70,6 +72,14 @@ public class MainController {
     private class GenerationHandler extends AsyncTask<Void, String, Image> {
         private Label progress = new Label();
 
+        Coordinate coordinateToDraw = new Coordinate(0, 0);
+
+        public Coordinate getCoordinateToDraw() {
+            Coordinate result = coordinateToDraw;
+            this.coordinateToDraw = SpiralDrawer.nextCoordinate(result);
+            return result;
+        }
+
         @Override
         public void onPreExecute() {
             generate.setDisable(true);
@@ -85,7 +95,7 @@ public class MainController {
             double power = powerSlider.getValue();
             double dc = distanceCSlider.getValue();
 
-            publishProgress("Prepearing...");
+            publishProgress("Preparing...");
             WritableImage image = new WritableImage(size, size);
             PixelWriter pw = image.getPixelWriter();
 
@@ -93,15 +103,25 @@ public class MainController {
             World world = generator.getWorld();
 
             publishProgress("Generating...");
+
+
             generator.setCallback((w) -> {
                 publishProgress("Displaying...");
-                world.forEach((pos, chunk) -> pw.setColor(pos.getX() + size / 2, pos.getY() + size / 2,
-                        BlockColor.blockColor[chunk.getId()]));
+                // world.forEach((pos, chunk) -> pw.setColor(pos.getX() + size / 2, pos.getY() + size / 2,
+                //       BlockColor.blockColor[chunk.getId()]));
+                for (int i = 0; i < size; i++) {
+                    Coordinate pos = getCoordinateToDraw();
+                    Chunk chunk = world.getChunk(pos);
+                    pw.setColor(pos.getX() + size / 2, pos.getY() + size / 2,
+                            BlockColor.blockColor[chunk.getId()]);
+                }
                 publishProgress("Generating...");
             }).preparePlanet().generateRandomEarth(threshold, power, dc);
 
             return image;
+
         }
+
 
         @Override
         public void onPostExecute(Image image) {
@@ -110,7 +130,6 @@ public class MainController {
             iv.fitWidthProperty().bind(worldPane.widthProperty());
             iv.fitHeightProperty().bind(worldPane.heightProperty());
             worldPane.getChildren().add(iv);
-
             worldPane.getChildren().remove(progress);
             generate.setDisable(false);
         }
