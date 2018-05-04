@@ -1,4 +1,4 @@
-package com.dekinci.eden.model.utils;
+package com.dekinci.eden.utils;
 
 import javafx.application.Platform;
 

@@ -1,12 +1,13 @@
 package com.dekinci.eden.gui;
 
-import com.dekinci.eden.model.utils.AsyncTask;
-import com.dekinci.eden.model.world.Coordinate;
+import com.dekinci.eden.utils.AsyncTask;
 import com.dekinci.eden.model.world.World;
-import com.dekinci.eden.model.world.chunk.Chunk;
+import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
@@ -14,6 +15,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.StackPane;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MainController {
@@ -46,7 +49,8 @@ public class MainController {
     @FXML
     TitledPane defaultGenType;
 
-    private final AtomicReference<Image> finalImage = new AtomicReference<>();
+    private Image finalImage;
+    private String fSize, fThresh, fPow, fDist;
 
     @FXML
     public void initialize() {
@@ -63,66 +67,62 @@ public class MainController {
     }
 
     private void bindLabelAndSlider(double def, String format, Slider slider, Label label) {
-        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            label.setText(String.format(format, (double) newValue));
-        });
+        slider.valueProperty().addListener((observable, oldValue, newValue) ->
+                label.setText(String.format(format, (double) newValue)));
         slider.setValue(def);
     }
 
-    private class GenerationHandler extends AsyncTask<Void, String, Image> {
-        private Label progress = new Label();
+    private class GenerationHandler extends AsyncTask<Void, String, Void> {
+        private final AtomicReference<PixelWriter> pw = new AtomicReference<>();
+        private final AtomicInteger size = new AtomicInteger();
+        private ImageView iv;
 
         @Override
         public void onPreExecute() {
             generate.setDisable(true);
 
             worldPane.getChildren().clear();
-            worldPane.getChildren().add(progress);
+            size.set((int) sizeSlider.getValue());
+
+            WritableImage image = new WritableImage(size.get(), size.get());
+            finalImage = image;
+            fSize = sizeLabel.getText();
+            fThresh = thresholdLabel.getText();
+            fPow = powerLabel.getText();
+            fDist = distanceLabel.getText();
+
+
+            iv = new ImageView(image);
+            iv.fitWidthProperty().bind(worldPane.widthProperty());
+            iv.fitHeightProperty().bind(worldPane.heightProperty());
+            worldPane.getChildren().add(iv);
+
+            pw.set(image.getPixelWriter());
         }
 
         @Override
-        public Image doInBackground(Void... voids) {
-            int size = (int) sizeSlider.getValue();
+        public Void doInBackground(Void... voids) {
+            int center = size.get() / 2;
             double threshold = thresholdSlider.getValue();
             double power = powerSlider.getValue();
             double dc = distanceCSlider.getValue();
 
-            publishProgress("Preparing...");
-            WritableImage image = new WritableImage(size, size);
-            PixelWriter pw = image.getPixelWriter();
-
-            World.Generator generator = new World.Generator(size);
-            World world = generator.getWorld();
-
-            publishProgress("Generating...");
-
-
-            generator.setCallback((w) -> {
-                publishProgress("Displaying...");
-                 world.forEach((pos, chunk) -> pw.setColor(pos.getX() + size / 2, pos.getY() + size / 2,
-                      BlockColor.blockColor[chunk.getId()]));
-                publishProgress("Generating...");
+            World.Generator generator = new World.Generator(size.get());
+            generator.setCallback((c) -> {
+                Platform.runLater(() -> pw.get().setColor(
+                        c.getKey().getX() + center,
+                        c.getKey().getY() + center,
+                        BlockColor.blockColor[c.getValue().getId()]));
+                Platform.requestNextPulse();
             }).preparePlanet().generateRandomEarth(threshold, power, dc);
 
-            return image;
-
+            return null;
         }
 
-
         @Override
-        public void onPostExecute(Image image) {
-            finalImage.set(image);
-            ImageView iv = new ImageView(image);
-            iv.fitWidthProperty().bind(worldPane.widthProperty());
-            iv.fitHeightProperty().bind(worldPane.heightProperty());
-            worldPane.getChildren().add(iv);
-            worldPane.getChildren().remove(progress);
+        public void onPostExecute(Void aVoid) {
+            iv.setImage(finalImage);
             generate.setDisable(false);
-        }
-
-        @Override
-        public void progressCallback(String... params) {
-            progress.setText(params[0]);
         }
     }
 
@@ -135,24 +135,32 @@ public class MainController {
 
         @Override
         public Void doInBackground(Void... voids) {
-            if (finalImage.get() != null) {
+            if (finalImage != null) {
                 Path path = Paths.get("imges/" + (System.currentTimeMillis() / 1000 % 10000000) + ".png");
                 try {
                     Files.createFile(path);
 
-                    BufferedImage before = SwingFXUtils.fromFXImage(finalImage.get(), null);
-                    int w = before.getWidth();
-                    int h = before.getHeight();
-                    BufferedImage result = before;
+                    BufferedImage image = SwingFXUtils.fromFXImage(finalImage, null);
+                    int w = image.getWidth();
+                    int h = image.getHeight();
                     if (w < MIN_SIZE || h < MIN_SIZE) {
                         AffineTransform at = new AffineTransform();
                         at.scale(MIN_SIZE / w, MIN_SIZE / h);
                         AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-                        result = scaleOp.filter(before, null);
+                        image = scaleOp.filter(image, null);
                     }
 
-                    ImageIO.write(result, "png", path.toFile());
-                    finalImage.set(null);
+                    Graphics g = image.getGraphics();
+                    g.setFont(g.getFont().deriveFont(12f));
+                    g.setColor(Color.RED);
+                    g.drawString(fSize + ":" +
+                            fThresh + ":" +
+                            fPow + ":" + fDist,
+                            0, 15);
+                    g.dispose();
+
+                    ImageIO.write(image, "png", path.toFile());
+                    finalImage = null;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
