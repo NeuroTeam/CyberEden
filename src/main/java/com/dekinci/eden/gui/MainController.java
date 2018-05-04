@@ -72,14 +72,6 @@ public class MainController {
     private class GenerationHandler extends AsyncTask<Void, String, Image> {
         private Label progress = new Label();
 
-        Coordinate coordinateToDraw = new Coordinate(0, 0);
-
-        public Coordinate getCoordinateToDraw() {
-            Coordinate result = coordinateToDraw;
-            this.coordinateToDraw = SpiralDrawer.nextCoordinate(result);
-            return result;
-        }
-
         @Override
         public void onPreExecute() {
             generate.setDisable(true);
@@ -107,14 +99,8 @@ public class MainController {
 
             generator.setCallback((w) -> {
                 publishProgress("Displaying...");
-                // world.forEach((pos, chunk) -> pw.setColor(pos.getX() + size / 2, pos.getY() + size / 2,
-                //       BlockColor.blockColor[chunk.getId()]));
-                for (int i = 0; i < size; i++) {
-                    Coordinate pos = getCoordinateToDraw();
-                    Chunk chunk = world.getChunk(pos);
-                    pw.setColor(pos.getX() + size / 2, pos.getY() + size / 2,
-                            BlockColor.blockColor[chunk.getId()]);
-                }
+                 world.forEach((pos, chunk) -> pw.setColor(pos.getX() + size / 2, pos.getY() + size / 2,
+                      BlockColor.blockColor[chunk.getId()]));
                 publishProgress("Generating...");
             }).preparePlanet().generateRandomEarth(threshold, power, dc);
 

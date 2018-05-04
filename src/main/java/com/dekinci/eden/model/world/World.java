@@ -2,6 +2,7 @@ package com.dekinci.eden.model.world;
 
 import com.dekinci.eden.model.utils.FactCallback;
 import com.dekinci.eden.model.world.chunk.Chunk;
+import com.dekinci.eden.model.world.chunk.EarthChunk;
 import com.dekinci.eden.model.world.chunk.EmptyChunk;
 import com.dekinci.eden.model.world.chunk.WaterChunk;
 import com.dekinci.eden.model.world.chunk.factories.*;
@@ -15,7 +16,7 @@ public class World {
     private int size;
     private int radius;
 
-    public Chunk getChunk(Coordinate pos){
+    public Chunk getChunk(Coordinate pos) {
         return chunkMap.get(pos);
     }
 
@@ -91,7 +92,8 @@ public class World {
 
         public Generator generateRandomEarth(double threshold, double power, double distanceCoeff) {
             EarthChunkFactory landFactory = new EarthChunkFactory();
-            sparse(threshold, power, distanceCoeff, world, new Coordinate(0, 0), landFactory);
+            //sparse(threshold, power, distanceCoeff, world, new Coordinate(0, 0), landFactory);
+            spiralSparse(threshold, power, distanceCoeff, world, new Coordinate(0, 0), landFactory);
             update();
             return this;
         }
@@ -106,8 +108,8 @@ public class World {
         }
 
         private void sparse(double size, double power, double distance, World world, Coordinate start, ChunkFactory factory) {
-            assert size >= 0.0 && size <= 1.0;
 
+            assert size >= 0.0 && size <= 1.0;
             Set<Coordinate> visited = new HashSet<>(world.size * world.size);
             Queue<Coordinate> queue = new LinkedList<>();
             queue.add(start);
@@ -137,6 +139,44 @@ public class World {
                         world.chunkMap.getOrDefault(Coordinate.leftTo(current), new EmptyChunk()).getId() == WaterChunk.ID)
                     queue.add(Coordinate.leftTo(current));
             }
+        }
+
+        private void spiralSparse(double size, double power, double distance, World world, Coordinate start, ChunkFactory factory) {
+
+            assert size >= 0.0 && size <= 1.0;
+
+            Queue<Coordinate> queue = new LinkedList<>();
+            queue.add(start);
+            Random r = new Random();
+
+            while (!queue.isEmpty()) {
+
+                Coordinate current = queue.remove();
+
+                world.chunkMap.put(current, factory.create());
+
+                double probability = Math.pow((1 - current.hypotenuse() / world.radius), power) * distance;
+                double randomDouble = r.nextDouble();
+                if (r.nextDouble() - probability < size &&
+                        world.chunkMap.getOrDefault(Spiral.nextCoordinate(current), new EmptyChunk()).getId() == WaterChunk.ID)
+                    queue.add(Spiral.nextCoordinate(current));
+            }
+        }
+
+        public void smooth(double size, double power, double distance, World world, Coordinate start, ChunkFactory factory) {
+            assert size >= 0.0 && size <= 1.0;
+            for (Coordinate coordinate : world.chunkMap.keySet()) {
+                double probability = Math.pow((1 - coordinate.hypotenuse() / world.radius), power) * distance;
+            }
+        }
+
+        private int smoothProb(Coordinate coordinate) {
+            int result = 0;
+            if (world.chunkMap.get(Coordinate.downTo(coordinate)).getId()== EarthChunk.ID) result++;
+            if (world.chunkMap.get(Coordinate.upTo(coordinate)).getId()== EarthChunk.ID) result++;
+            if (world.chunkMap.get(Coordinate.rightTo(coordinate)).getId()== EarthChunk.ID) result++;
+            if (world.chunkMap.get(Coordinate.leftTo(coordinate)).getId()== EarthChunk.ID) result++;
+            return result;
         }
 
         private void update() {
