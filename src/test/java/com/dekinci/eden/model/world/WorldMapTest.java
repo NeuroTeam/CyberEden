@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class WorldTest {
+class WorldMapTest {
 
     @BeforeEach
     void setUp() {
@@ -18,7 +18,7 @@ class WorldTest {
 
     @Test
     void generateTest() {
-//        World world = new World.Generator().generateRandom(21);
-//        System.out.println(world.toString());
+//        WorldMap worldMap = new WorldMap.Generator().generateRandom(21);
+//        System.out.println(worldMap.toString());
     }
 }

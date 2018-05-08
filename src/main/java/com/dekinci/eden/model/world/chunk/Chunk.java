@@ -13,4 +13,8 @@ public abstract class Chunk {
 
     protected Chunk() {
     }
+
+    public void setBlock(int i, int j, byte block) {
+        blocks[i * SIZE + j] = block;
+    }
 }

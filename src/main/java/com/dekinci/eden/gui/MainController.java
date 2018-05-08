@@ -1,7 +1,7 @@
 package com.dekinci.eden.gui;
 
+import com.dekinci.eden.model.world.WorldMap;
 import com.dekinci.eden.utils.AsyncTask;
-import com.dekinci.eden.model.world.World;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
@@ -107,7 +107,7 @@ public class MainController {
             double power = powerSlider.getValue();
             double dc = distanceCSlider.getValue();
 
-            World.Generator generator = new World.Generator(size.get());
+            WorldMap.Generator generator = new WorldMap.Generator(size.get());
             generator.setCallback((c) -> {
                 Platform.runLater(() -> pw.get().setColor(
                         c.getKey().getX() + center,

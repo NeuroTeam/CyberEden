@@ -1,7 +1,5 @@
 package com.dekinci.eden.model.world;
 
-import com.dekinci.eden.model.world.Coordinate;
-
 public class Spiral {
 
 
