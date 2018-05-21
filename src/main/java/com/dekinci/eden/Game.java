@@ -1,12 +1,15 @@
 package com.dekinci.eden;
 
+import com.dekinci.eden.GameUtils.Position;
 import com.dekinci.eden.model.animal.Animal;
+import com.dekinci.eden.model.animal.AnimalFactory;
+import com.dekinci.eden.model.animal.WolfFactory;
+import com.dekinci.eden.model.animal.actions.Action;
 import com.dekinci.eden.model.world.Coordinate;
 import com.dekinci.eden.model.world.WorldMap;
 import com.dekinci.eden.utils.ResultCallback;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Game {
@@ -25,9 +28,12 @@ public class Game {
     public static final int STATE_STOPPED = 6;
 
     private WorldMap worldMap;
+
     private ResultCallback<Coordinate> worldChangeListener;
 
-    private Map<Coordinate, Animal> animals = new HashMap<>(500);
+    private AnimalManager animalManager = new AnimalManager();
+
+    private List<Position> animals = new ArrayList<>();
 
     public void createWorld(WorldMap.Generator generator) {
         worldMap = generator.getWorldMap();
@@ -37,11 +43,33 @@ public class Game {
         worldChangeListener = listener;
     }
 
+    public void setAnimals() {
+        animalManager.setAnimals();
+    }
+
     public void tick() {
-        var entrySet = animals.entrySet();
-        for (Map.Entry<Coordinate, Animal> entry : entrySet) {
-            Animal animal = entry.getValue();
-            animal.makeDecision(worldMap.getView(entry.getKey(), animal.getSight()));
+        for (Position pos : animals) {
+            Animal animal = pos.getAnimal();
+            Action action = animal.makeDecision(worldMap.getView(pos.getCoordinate(), animal.getSight()));
+            action.act(pos.getCoordinate());
         }
+    }
+
+
+    private class AnimalManager {
+        private AnimalFactory wolfFactory = new WolfFactory();
+
+        void addWolf(Coordinate coordinate) {
+            animals.add(new Position(wolfFactory.create(), coordinate));
+        }
+
+        private Random random = new Random();
+
+        void setAnimals() {
+            for (int i = 0; i < 200; i++) {
+                addWolf(new Coordinate(random.nextInt(50), random.nextInt(50)));
+            }
+        }
+
     }
 }

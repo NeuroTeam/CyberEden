@@ -12,9 +12,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dekinci.eden.gui.MainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dekinci.eden.gui.MainController">
    <bottom>
-      <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
             <Button fx:id="generate" mnemonicParsing="false" prefWidth="9999.0" text="GENERATE">
                <HBox.margin>
@@ -22,7 +22,11 @@
                </HBox.margin>
             </Button>
             <Button fx:id="saveButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefWidth="9999.0" text="Save" />
+            <Button fx:id="startButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefWidth="9999.0" text="Start" />
          </children>
+         <padding>
+            <Insets top="5.0" />
+         </padding>
       </HBox>
    </bottom>
    <center>

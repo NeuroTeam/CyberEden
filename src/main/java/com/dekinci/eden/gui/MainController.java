@@ -29,8 +29,13 @@ import java.util.concurrent.atomic.AtomicReference;
 public class MainController {
     private static final int MIN_SIZE = 600;
 
+
+
     @FXML
     StackPane worldPane;
+
+    @FXML
+    Button startButton;
 
     @FXML
     Button generate;
@@ -46,6 +51,7 @@ public class MainController {
 
     @FXML
     Accordion genType;
+
     @FXML
     TitledPane defaultGenType;
 
@@ -174,4 +180,5 @@ public class MainController {
             saveButton.setDisable(false);
         }
     }
+
 }
