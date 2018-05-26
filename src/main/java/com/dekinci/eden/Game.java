@@ -3,6 +3,7 @@ package com.dekinci.eden;
 import com.dekinci.eden.model.animal.Animal;
 import com.dekinci.eden.model.world.Coordinate;
 import com.dekinci.eden.model.world.WorldMap;
+import com.dekinci.eden.model.world.generation.WorldGenerator;
 import com.dekinci.eden.utils.ResultCallback;
 
 import java.util.HashMap;
@@ -29,8 +30,9 @@ public class Game {
 
     private Map<Coordinate, Animal> animals = new HashMap<>(500);
 
-    public void createWorld(WorldMap.Generator generator) {
-        worldMap = generator.getWorldMap();
+    public void createWorld(int size) {
+        WorldGenerator generator = new WorldGenerator(size);
+        worldMap = generator.getWorld();
     }
 
     public void setWorldChangeListener(ResultCallback<Coordinate> listener) {
@@ -43,5 +45,9 @@ public class Game {
             Animal animal = entry.getValue();
             animal.makeDecision(worldMap.getView(entry.getKey(), animal.getSight()));
         }
+    }
+
+    public WorldMap getWorldMap() {
+        return worldMap;
     }
 }

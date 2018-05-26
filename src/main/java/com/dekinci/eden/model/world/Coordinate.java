@@ -1,5 +1,7 @@
 package com.dekinci.eden.model.world;
 
+import java.util.function.Consumer;
+
 public class Coordinate {
     private int x = 0, y = 0;
 
@@ -55,5 +57,15 @@ public class Coordinate {
     @Override
     public int hashCode() {
         return 31 * x + y;
+    }
+
+    /**
+     * a *
+     * * b
+     */
+    public static void foreachInRectangle(Coordinate a, Coordinate b, Consumer<Coordinate> consumer) {
+        for (int iterX = a.x; iterX < b.x; iterX++)
+            for (int iterY = a.y; iterY < b.y; iterY++)
+                consumer.accept(new Coordinate(iterX, iterY));
     }
 }

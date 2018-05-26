@@ -1,6 +1,7 @@
 package com.dekinci.eden.gui;
 
-import com.dekinci.eden.model.world.WorldMap;
+import com.dekinci.eden.model.world.chunk.Chunk;
+import com.dekinci.eden.model.world.generation.WorldGenerator;
 import com.dekinci.eden.utils.AsyncTask;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
@@ -74,7 +75,8 @@ public class MainController {
 
     private class GenerationHandler extends AsyncTask<Void, String, Void> {
         private final AtomicReference<PixelWriter> pw = new AtomicReference<>();
-        private final AtomicInteger size = new AtomicInteger();
+        private volatile int worldSizeInChunks;
+        private volatile int worldSizeInBlocks;
         private ImageView iv;
 
         @Override
@@ -82,9 +84,10 @@ public class MainController {
             generate.setDisable(true);
 
             worldPane.getChildren().clear();
-            size.set((int) sizeSlider.getValue());
+            worldSizeInChunks = (int) sizeSlider.getValue();
+            worldSizeInBlocks = worldSizeInChunks * Chunk.SIZE;
 
-            WritableImage image = new WritableImage(size.get(), size.get());
+            WritableImage image = new WritableImage(worldSizeInBlocks, worldSizeInBlocks);
             finalImage = image;
             fSize = sizeLabel.getText();
             fThresh = thresholdLabel.getText();
@@ -102,18 +105,19 @@ public class MainController {
 
         @Override
         public Void doInBackground(Void... voids) {
-            int center = size.get() / 2;
+            int center = worldSizeInBlocks / 2;
             double threshold = thresholdSlider.getValue();
             double power = powerSlider.getValue();
             double dc = distanceCSlider.getValue();
 
-            WorldMap.Generator generator = new WorldMap.Generator(size.get());
+            WorldGenerator generator = new WorldGenerator(worldSizeInChunks);
             generator.setCallback((c) -> {
-                Platform.runLater(() -> pw.get().setColor(
-                        c.getKey().getX() + center,
-                        c.getKey().getY() + center,
-                        BlockColor.blockColor[c.getValue().getId()]));
-                Platform.requestNextPulse();
+                Platform.runLater(() -> {
+                    pw.get().setColor(
+                            c.getKey().getX() + center,
+                            c.getKey().getY() + center,
+                            BlockColor.blockColor[c.getValue()]);
+                });
             }).preparePlanet().generateRandomEarth(threshold, power, dc);
 
             return null;

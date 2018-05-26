@@ -4,6 +4,6 @@ import javafx.scene.paint.Color;
 
 public class BlockColor {
     public final static Color[] blockColor = {
-            Color.BLACK, Color.VIOLET, Color.BLUE, Color.GREEN
+            Color.BLACK, Color.VIOLET, Color.BLUE, Color.BROWN
     };
 }

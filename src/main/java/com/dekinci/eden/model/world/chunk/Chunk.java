@@ -1,20 +1,36 @@
 package com.dekinci.eden.model.world.chunk;
 
-public abstract class Chunk {
-    public static final int SIZE = 64;
+import com.dekinci.eden.model.world.Coordinate;
+
+public class Chunk {
+    public static final int SIZE = 32;
 
     private byte[] blocks = new byte[SIZE * SIZE];
 
-    public static Chunk generate(long seed) {
-        return null;
+    public static Chunk generate() {
+        return new Chunk();
     }
-
-    public abstract int getId();
 
     protected Chunk() {
     }
 
-    public void setBlock(int i, int j, byte block) {
-        blocks[i * SIZE + j] = block;
+    public int getBlock(Coordinate c) {
+        return blocks[getPos(c)];
+    }
+
+    public void setBlock(Coordinate c, byte blockId) {
+        blocks[getPos(c)] = blockId;
+    }
+
+    protected int getPos(Coordinate c) {
+        int x = c.getX();
+        x = x < 0 ? -x : x;
+        x %= SIZE;
+
+        int y = c.getY();
+        y = y < 0 ? -y : y;
+        y %= SIZE;
+
+        return x * SIZE + y;
     }
 }

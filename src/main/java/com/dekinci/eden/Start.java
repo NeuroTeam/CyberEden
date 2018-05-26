@@ -24,7 +24,7 @@ public class Start extends Application {
             System.exit(0);
         });
 
-        BorderPane pane = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().getResource("main.fxml")));
+        BorderPane pane = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().getResource("gui/main.fxml")));
         primaryStage.setScene(new Scene(pane, pane.widthProperty().intValue(), pane.heightProperty().intValue()));
         primaryStage.show();
     }
