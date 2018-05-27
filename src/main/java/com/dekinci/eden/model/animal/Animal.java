@@ -6,4 +6,8 @@ public interface Animal {
     Action makeDecision(AnimalView view);
     State getState();
     int getSight();
+
+
+
+
 }
