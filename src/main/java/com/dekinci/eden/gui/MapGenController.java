@@ -61,6 +61,8 @@ public class MapGenController {
 
     private Coordinate center = new Coordinate(0, 0);
 
+    private boolean isUp, isDown, isRight, isLeft;
+
     private enum MoveDirection {
         UP, DOWN, LEFT, RIGHT
     }
@@ -78,7 +80,8 @@ public class MapGenController {
 
         worldPane.setFocusTraversable(true);
         worldPane.addEventFilter(MouseEvent.ANY, (e) -> mapCanvas.requestFocus());
-        worldPane.setOnKeyPressed(this::handleKeyboard);
+        worldPane.setOnKeyPressed(this::handlePressed);
+        worldPane.setOnKeyReleased(this::handleReleased);
 
         worldPane.widthProperty().addListener((observable, oldValue, newValue) -> resizeAndDraw());
         worldPane.heightProperty().addListener((observable, oldValue, newValue) -> resizeAndDraw());
@@ -130,47 +133,59 @@ public class MapGenController {
         slider.setValue(def);
     }
 
-    private void handleKeyboard(KeyEvent event) {
+    private void handlePressed(KeyEvent event) {
         switch (event.getCode().getCode()) {
             case 87: //aka w
-                move(MoveDirection.UP);
+                isUp = true;
                 break;
             case 83: //aka s
-                move(MoveDirection.DOWN);
+                isDown = true;
                 break;
             case 65: //aka a
-                move(MoveDirection.LEFT);
+                isLeft = true;
                 break;
             case 68: //aka d
-                move(MoveDirection.RIGHT);
+                isRight = true;
                 break;
-            default:
-                System.out.println("Pressed " + event.getCode().getCode());
         }
+
+        move();
     }
 
-    private void move(MoveDirection direction) {
+    private void handleReleased(KeyEvent event) {
+        switch (event.getCode().getCode()) {
+            case 87: //aka w
+                isUp = false;
+                break;
+            case 83: //aka s
+                isDown = false;
+                break;
+            case 65: //aka a
+                isLeft = false;
+                break;
+            case 68: //aka d
+                isRight = false;
+                break;
+        }
+        move();
+    }
+
+    private void move() {
         if (worldMap == null)
             return;
 
-        switch (direction) {
-            case UP:
-                if (worldMap.get(Coordinate.downTo(center)) != BlockManager.VOID_BLOCK_ID)
-                    center = Coordinate.downTo(center);
-                break;
-            case DOWN:
-                if (worldMap.get(Coordinate.upTo(center)) != BlockManager.VOID_BLOCK_ID)
-                    center = Coordinate.upTo(center);
-                break;
-            case LEFT:
-                if (worldMap.get(Coordinate.leftTo(center)) != BlockManager.VOID_BLOCK_ID)
-                    center = Coordinate.leftTo(center);
-                break;
-            case RIGHT:
-                if (worldMap.get(Coordinate.rightTo(center)) != BlockManager.VOID_BLOCK_ID)
-                    center = Coordinate.rightTo(center);
-                break;
-        }
+        if (isUp && !isDown)
+            if (worldMap.get(Coordinate.downTo(center)) != BlockManager.VOID_BLOCK_ID)
+                center = Coordinate.downTo(center);
+        if (isDown && !isUp)
+            if (worldMap.get(Coordinate.upTo(center)) != BlockManager.VOID_BLOCK_ID)
+                center = Coordinate.upTo(center);
+        if (isLeft && !isRight)
+            if (worldMap.get(Coordinate.leftTo(center)) != BlockManager.VOID_BLOCK_ID)
+                center = Coordinate.leftTo(center);
+        if (isRight && !isLeft)
+            if (worldMap.get(Coordinate.rightTo(center)) != BlockManager.VOID_BLOCK_ID)
+                center = Coordinate.rightTo(center);
 
         draw();
     }
