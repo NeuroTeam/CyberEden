@@ -1,25 +1,20 @@
 package com.dekinci.eden.gui;
 
-import com.dekinci.eden.App;
 import com.dekinci.eden.model.world.Coordinate;
 import com.dekinci.eden.model.world.WorldMap;
 import com.dekinci.eden.model.world.blocks.BlockManager;
 import com.dekinci.eden.model.world.generation.WorldGenerator;
 import com.dekinci.eden.utils.AsyncTask;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -32,8 +27,6 @@ import java.nio.file.Paths;
 import static java.awt.color.ColorSpace.TYPE_RGB;
 
 public class MapGenController {
-    private static final int TILE_RES = 16;
-
     @FXML
     StackPane worldPane;
 
@@ -58,6 +51,9 @@ public class MapGenController {
     private String fSize, fThresh, fPow, fDist;
 
     private WorldMap worldMap;
+
+    private int tileRes = 16;
+    private double tileScale = tileRes;
 
     @FXML
     Canvas mapCanvas;
@@ -88,10 +84,22 @@ public class MapGenController {
 
         worldPane.widthProperty().addListener((observable, oldValue, newValue) -> resizeAndDraw());
         worldPane.heightProperty().addListener((observable, oldValue, newValue) -> resizeAndDraw());
+        worldPane.setOnScroll(event -> zoom((int) event.getDeltaY()));  //One piece is 40
+    }
+
+    private void zoom(int delta) {
+        if ((tileRes < 4 && delta < 0)|| (tileRes > 128 && delta > 0))
+            return;
+
+        tileScale += delta / 40.0;
+        tileRes = (int) tileScale;
+        System.out.println(tileRes);
+        resizeAndDraw();
     }
 
     private void resizeAndDraw() {
         resize();
+        clear();
         draw();
     }
 
@@ -108,8 +116,8 @@ public class MapGenController {
         mapCanvas.setWidth(width);
         mapCanvas.setHeight(height);
 
-        int deltaW = width / TILE_RES / 2;
-        int deltaH = height / TILE_RES / 2;
+        int deltaW = width / tileRes / 2;
+        int deltaH = height / tileRes / 2;
 
         leftBottom = new Coordinate(centerX - deltaW, centerY - deltaH);
         rightTop = new Coordinate(centerX + deltaW, centerY + deltaH);
@@ -196,14 +204,19 @@ public class MapGenController {
         draw();
     }
 
+    private void clear() {
+        if (graphicsContext != null)
+        graphicsContext.clearRect(0, 0, mapCanvas.getWidth(), mapCanvas.getHeight());
+    }
+
     private void draw() {
         if (worldMap != null)
             Coordinate.foreachInRectangle(leftBottom, rightTop, (c) -> drawTile(c.relativeTo(leftBottom), worldMap.get(c)));
     }
 
     private void drawTile(Coordinate relative, byte id) {
-        graphicsContext.drawImage(TextureManager.get(id), relative.getX() * TILE_RES, relative.getY() * TILE_RES,
-                TILE_RES, TILE_RES);
+        graphicsContext.drawImage(TextureManager.get(id), relative.getX() * tileRes, relative.getY() * tileRes,
+                tileRes, tileRes);
     }
 
     private class GenerationHandler extends AsyncTask<Void, String, WorldMap> {
@@ -293,15 +306,15 @@ public class MapGenController {
 
     private BufferedImage imageFromWorld(WorldMap worldMap) {
         int size = worldMap.getSizeInBlocks();
-        BufferedImage image = new BufferedImage(size * TILE_RES, size * TILE_RES, TYPE_RGB);
+        BufferedImage image = new BufferedImage(size * tileRes, size * tileRes, TYPE_RGB);
         Graphics g = image.getGraphics();
 
         Coordinate leftTop = new Coordinate(-size / 2, -size / 2);
         Coordinate rightBottom = new Coordinate(size / 2, size / 2);
         Coordinate.foreachInRectangle(leftTop, rightBottom, c -> g.drawImage(
                 SwingFXUtils.fromFXImage(TextureManager.get(worldMap.get(c)), null),
-                c.relativeTo(leftTop).getX() * TILE_RES, c.relativeTo(leftTop).getY() * TILE_RES,
-                TILE_RES, TILE_RES, null));
+                c.relativeTo(leftTop).getX() * tileRes, c.relativeTo(leftTop).getY() * tileRes,
+                tileRes, tileRes, null));
         g.dispose();
 
         return image;
