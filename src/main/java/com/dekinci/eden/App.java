@@ -15,12 +15,25 @@ public class App extends Application {
     private static App currentApp;
     private Stage stage;
 
+    private Game game;
+
     public static void main(String[] args) {
         launch(args);
     }
 
     public static App getApp() {
         return currentApp;
+    }
+
+    public void setGame() {
+        game = new Game();
+    }
+
+    public Game getGame() {
+        if (game == null)
+            throw new NullPointerException("Game is null");
+
+        return game;
     }
 
     @Override
@@ -30,10 +43,10 @@ public class App extends Application {
         this.stage = primaryStage;
         this.stage.setTitle("CyberEden");
         primaryStage.setOnCloseRequest(event -> System.exit(0));
-        showMainMenu();
+        toMainMenu();
     }
 
-    public void showMainMenu() {
+    public void toMainMenu() {
         try {
             Pane root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().getResource("gui/main_menu.fxml")));
             BackgroundImage bi = new BackgroundImage(new Image("gui/art.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
@@ -60,6 +73,13 @@ public class App extends Application {
     }
 
     public void showGame() {
-
+        try {
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().getResource("gui/game.fxml")));
+            stage.setScene(new Scene(root, stage.getWidth(), stage.getHeight()));
+            if (!stage.isShowing())
+                stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

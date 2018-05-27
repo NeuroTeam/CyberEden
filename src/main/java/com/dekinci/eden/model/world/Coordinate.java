@@ -93,4 +93,16 @@ public class Coordinate {
             for (int iterY = a.y; iterY < b.y; iterY++)
                 consumer.accept(new Coordinate(iterX, iterY));
     }
+
+    public static void foreachInRectangle(Coordinate center, int width, int height, Consumer<Coordinate> consumer) {
+        int sX = center.x - width / 2;
+        int eX = center.x + width / 2;
+
+        int sY = center.y - height / 2;
+        int eY = center.y + height / 2;
+
+        for (int iterX = sX; iterX < eX; iterX++)
+            for (int iterY = sY; iterY < eY; iterY++)
+                consumer.accept(new Coordinate(iterX, iterY));
+    }
 }

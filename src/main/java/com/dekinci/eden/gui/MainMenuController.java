@@ -11,6 +11,9 @@ public class MainMenuController {
 
     @FXML
     public void initialize() {
-        createButton.setOnMouseClicked(event -> App.getApp().showMapPreview());
+        createButton.setOnMouseClicked(event -> {
+            App.getApp().setGame();
+            App.getApp().showMapPreview();
+        });
     }
 }

@@ -8,12 +8,24 @@ import java.util.Random;
 
 
 public class Wolf implements Animal {
-
-
     private static final int SIGHT = 2;
 
     private Random r = new Random();
 
+    @Override
+    public String getName() {
+        return "Mr. Woof Wolf";
+    }
+
+    @Override
+    public int getId() {
+        return 0;
+    }
+
+    @Override
+    public Genotype getGenotype() {
+        return new Genotype();
+    }
 
     @Override
     public Action makeDecision(AnimalView view) {

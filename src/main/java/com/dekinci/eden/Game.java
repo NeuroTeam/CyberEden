@@ -1,22 +1,15 @@
 package com.dekinci.eden;
 
+import com.dekinci.eden.model.CoordinateInfo;
 import com.dekinci.eden.model.animal.Animal;
 import com.dekinci.eden.model.world.Coordinate;
 import com.dekinci.eden.model.world.WorldMap;
-import com.dekinci.eden.model.world.generation.WorldGenerator;
 import com.dekinci.eden.utils.ResultCallback;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Game {
-    private static final AtomicReference<Game> current = new AtomicReference<>(new Game());
-
-    public static Game current() {
-        return current.get();
-    }
-
     public static final int STATE_NOT_READY = 0;
     public static final int STATE_INITIALIZED = 1;
     public static final int STATE_READY = 2;
@@ -25,14 +18,22 @@ public class Game {
     public static final int STATE_STOPPING = 5;
     public static final int STATE_STOPPED = 6;
 
+    private int state;
+
+    Game() {
+        setState(STATE_NOT_READY);
+    }
+
     private WorldMap worldMap;
     private ResultCallback<Coordinate> worldChangeListener;
 
     private Map<Coordinate, Animal> animals = new HashMap<>(500);
 
-    public void createWorld(int size) {
-        WorldGenerator generator = new WorldGenerator(size);
-        worldMap = generator.getWorld();
+    public void setWorldMap(WorldMap worldMap) {
+        this.worldMap = worldMap;
+
+        setState(STATE_INITIALIZED);
+        setState(STATE_READY);
     }
 
     public void setWorldChangeListener(ResultCallback<Coordinate> listener) {
@@ -40,6 +41,9 @@ public class Game {
     }
 
     public void tick() {
+        if (state != STATE_RUNNING)
+            throw new IllegalStateException("Game state is " + state + " and not " + STATE_RUNNING);
+
         var entrySet = animals.entrySet();
         for (Map.Entry<Coordinate, Animal> entry : entrySet) {
             Animal animal = entry.getValue();
@@ -47,7 +51,21 @@ public class Game {
         }
     }
 
+    public CoordinateInfo getCoordinateInfo(Coordinate c) {
+        CoordinateInfo result = new CoordinateInfo(c, worldMap.get(c), worldMap.getChunkId(c));
+        //result add animals on c
+        return result;
+    }
+
     public WorldMap getWorldMap() {
+        if (state == STATE_NOT_READY)
+            throw new IllegalStateException("Game state is " + STATE_NOT_READY + " and not other");
+
         return worldMap;
+    }
+
+    private void setState(int state) {
+        this.state = state;
+        System.out.println("GAME is now in state " + state);
     }
 }

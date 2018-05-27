@@ -26,8 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static java.awt.color.ColorSpace.TYPE_RGB;
-
 public class MapGenController {
     @FXML
     StackPane worldPane;
@@ -61,9 +59,7 @@ public class MapGenController {
     Canvas mapCanvas;
     private GraphicsContext graphicsContext;
 
-
-    private Coordinate leftBottom = new Coordinate(0, 0);
-    private Coordinate rightTop = new Coordinate(0, 0);
+    private Coordinate center = new Coordinate(0, 0);
 
     private enum MoveDirection {
         UP, DOWN, LEFT, RIGHT
@@ -80,27 +76,34 @@ public class MapGenController {
         saveButton.setOnMouseClicked(event -> new SaveHandler().execute());
         generate.setOnMouseClicked(event -> new GenerationHandler().execute());
 
-        mapCanvas.setFocusTraversable(true);
-        mapCanvas.addEventFilter(MouseEvent.ANY, (e) -> mapCanvas.requestFocus());
-        mapCanvas.setOnKeyPressed(this::handleKeyboard);
+        worldPane.setFocusTraversable(true);
+        worldPane.addEventFilter(MouseEvent.ANY, (e) -> mapCanvas.requestFocus());
+        worldPane.setOnKeyPressed(this::handleKeyboard);
 
         worldPane.widthProperty().addListener((observable, oldValue, newValue) -> resizeAndDraw());
         worldPane.heightProperty().addListener((observable, oldValue, newValue) -> resizeAndDraw());
         worldPane.setOnScroll(event -> zoom((int) event.getDeltaY()));  //One piece is 40
+
+        startButton.setOnMouseClicked(event -> {
+            if (worldMap != null) {
+                App.getApp().getGame().setWorldMap(worldMap);
+                App.getApp().showGame();
+            }
+        });
     }
 
     @FXML
     private void backToMenu(ActionEvent event) {
-        App.getApp().showMainMenu();
+        App.getApp().toMainMenu();
     }
 
     private void zoom(int delta) {
-        if ((tileRes < 4 && delta < 0)|| (tileRes > 128 && delta > 0))
+        double difference = delta / 40.0;
+        if ((tileRes <= 4 && difference < 0) || (tileRes >= 64 && difference > 0))
             return;
 
-        tileScale += delta / 40.0;
+        tileScale += difference;
         tileRes = (int) tileScale;
-        System.out.println(tileRes);
         resizeAndDraw();
     }
 
@@ -114,20 +117,11 @@ public class MapGenController {
         if (worldMap == null)
             return;
 
-        int centerX = (leftBottom.getX() + rightTop.getX()) / 2;
-        int centerY = (leftBottom.getY() + rightTop.getY()) / 2;
-
         int width = (int) worldPane.getWidth();
         int height = (int) worldPane.getHeight();
 
         mapCanvas.setWidth(width);
         mapCanvas.setHeight(height);
-
-        int deltaW = width / tileRes / 2;
-        int deltaH = height / tileRes / 2;
-
-        leftBottom = new Coordinate(centerX - deltaW, centerY - deltaH);
-        rightTop = new Coordinate(centerX + deltaW, centerY + deltaH);
     }
 
     private void bindLabelAndSlider(double def, String format, Slider slider, Label label) {
@@ -161,48 +155,24 @@ public class MapGenController {
 
         switch (direction) {
             case UP:
-                moveUp();
+                if (worldMap.get(Coordinate.downTo(center)) != BlockManager.VOID_BLOCK_ID)
+                    center = Coordinate.downTo(center);
                 break;
             case DOWN:
-                moveDown();
+                if (worldMap.get(Coordinate.upTo(center)) != BlockManager.VOID_BLOCK_ID)
+                    center = Coordinate.upTo(center);
                 break;
             case LEFT:
-                moveLeft();
+                if (worldMap.get(Coordinate.leftTo(center)) != BlockManager.VOID_BLOCK_ID)
+                    center = Coordinate.leftTo(center);
                 break;
             case RIGHT:
-                moveRight();
+                if (worldMap.get(Coordinate.rightTo(center)) != BlockManager.VOID_BLOCK_ID)
+                    center = Coordinate.rightTo(center);
                 break;
         }
 
         draw();
-    }
-
-    private void moveUp() {
-        if (worldMap.get(Coordinate.downTo(leftBottom)) != BlockManager.VOID_BLOCK_ID) {
-            leftBottom = Coordinate.downTo(leftBottom);
-            rightTop = Coordinate.downTo(rightTop);
-        }
-    }
-
-    private void moveDown() {
-        if (worldMap.get(Coordinate.upTo(rightTop)) != BlockManager.VOID_BLOCK_ID) {
-            leftBottom = Coordinate.upTo(leftBottom);
-            rightTop = Coordinate.upTo(rightTop);
-        }
-    }
-
-    private void moveLeft() {
-        if (worldMap.get(Coordinate.leftTo(leftBottom)) != BlockManager.VOID_BLOCK_ID) {
-            leftBottom = Coordinate.leftTo(leftBottom);
-            rightTop = Coordinate.leftTo(rightTop);
-        }
-    }
-
-    private void moveRight() {
-        if (worldMap.get(Coordinate.rightTo(rightTop)) != BlockManager.VOID_BLOCK_ID) {
-            leftBottom = Coordinate.rightTo(leftBottom);
-            rightTop = Coordinate.rightTo(rightTop);
-        }
     }
 
     private void showMap() {
@@ -213,12 +183,17 @@ public class MapGenController {
 
     private void clear() {
         if (graphicsContext != null)
-        graphicsContext.clearRect(0, 0, mapCanvas.getWidth(), mapCanvas.getHeight());
+            graphicsContext.clearRect(0, 0, mapCanvas.getWidth(), mapCanvas.getHeight());
     }
 
     private void draw() {
+        int w = (int) worldPane.getWidth() / tileRes;
+        int h = (int) worldPane.getHeight() / tileRes;
+
+        Coordinate start = new Coordinate(center.getX() - w / 2, center.getY() - h / 2);
+
         if (worldMap != null)
-            Coordinate.foreachInRectangle(leftBottom, rightTop, (c) -> drawTile(c.relativeTo(leftBottom), worldMap.get(c)));
+            Coordinate.foreachInRectangle(center, w, h, (c) -> drawTile(c.relativeTo(start), worldMap.get(c)));
     }
 
     private void drawTile(Coordinate relative, byte id) {
@@ -256,7 +231,7 @@ public class MapGenController {
             WorldGenerator generator = new WorldGenerator(worldSizeInChunks);
             generator.preparePlanet().generateRandomEarth(threshold, power, dc);
             WorldMap worldMap = generator.getWorld();
-            minimap = imageFromWorld(worldMap);
+            minimap = worldMap.toImage();
 
             return worldMap;
         }
@@ -286,7 +261,7 @@ public class MapGenController {
                 Path path = Paths.get("imges/" + (System.currentTimeMillis() / 1000 % 10000000) + ".png");
                 try {
                     Files.createFile(path);
-                    BufferedImage image = imageFromWorld(worldMap);
+                    BufferedImage image = worldMap.toImage();
                     Graphics g = image.getGraphics();
                     g.setFont(g.getFont().deriveFont(12f));
                     g.setColor(Color.RED);
@@ -309,21 +284,5 @@ public class MapGenController {
             saveButton.setText("SAVE");
             saveButton.setDisable(false);
         }
-    }
-
-    private BufferedImage imageFromWorld(WorldMap worldMap) {
-        int size = worldMap.getSizeInBlocks();
-        BufferedImage image = new BufferedImage(size * TextureManager.TILE_RES, size * TextureManager.TILE_RES, TYPE_RGB);
-        Graphics g = image.getGraphics();
-
-        Coordinate leftTop = new Coordinate(-size / 2, -size / 2);
-        Coordinate rightBottom = new Coordinate(size / 2, size / 2);
-        Coordinate.foreachInRectangle(leftTop, rightBottom, c -> g.drawImage(
-                SwingFXUtils.fromFXImage(TextureManager.get(worldMap.get(c)), null),
-                c.relativeTo(leftTop).getX() * TextureManager.TILE_RES, c.relativeTo(leftTop).getY() * TextureManager.TILE_RES,
-                TextureManager.TILE_RES, TextureManager.TILE_RES, null));
-        g.dispose();
-
-        return image;
     }
 }
