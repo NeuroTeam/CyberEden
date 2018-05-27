@@ -18,7 +18,7 @@ public class Wolf implements Animal {
     }
 
 
-    //    @Override
+//    @Override
 //    public Action makeDecision(AnimalView view) {
 //        return new ActionMove(WorldSides.NORTH);
 //    }

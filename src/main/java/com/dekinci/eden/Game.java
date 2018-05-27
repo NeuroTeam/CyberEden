@@ -45,10 +45,18 @@ public class Game {
 
     private List<CoordinatedAnimal> animals = new ArrayList<>(initialNumOfAnimals);
 
-    private AnimalManager animalManager = new AnimalManager(animals, worldMap, initialNumOfAnimals);
+    private AnimalManager animalManager;
 
     public void setWorldChangeListener(ResultCallback<Coordinate> listener) {
         worldChangeListener = listener;
+    }
+
+    public void setAnimalManager() {
+        this.animalManager = new AnimalManager(animals, worldMap);
+    }
+
+    public void setAnimals() {
+        animalManager.setAnimals(initialNumOfAnimals);
     }
 
     public void tick() {
@@ -56,7 +64,7 @@ public class Game {
             return;
 
         grassTick();
-        //animalTick();
+        animalTick();
     }
 
     private void grassTick() {
@@ -89,33 +97,7 @@ public class Game {
     }
 
     private void animalTick() {
-        for (CoordinatedAnimal pos : animals) {
-            Animal animal = pos.getAnimal();
-            Coordinate coordinate = pos.getCoordinate();
-            switch (animal.makeDecision(worldMap.getView(coordinate, animal.getSight()))) {
-                case Decisions.MOVE:
-                    //oche ploho
-                    ActionMove move = new ActionMove(WorldSides.NORTH);
-                    byte nextBlock = worldMap.get(move.nextCoordinate(coordinate));
-                    if (nextBlock > BlockManager.WATER_BLOCK_ID) move.act(coordinate);
-                    break;
-                case Decisions.BREED:
-                    Animal otherAnimal = animalManager.getAnimal(coordinate);
-                    if ((otherAnimal != null) && otherAnimal.getClass() == animal.getClass()) {
-                        if (animal.getClass() == Wolf.class) animalManager.addWolf(coordinate);
-                        else animalManager.addHare(coordinate);
-                    }
-            }
-            if (animal.getState().hungry()) {
-                if (animal.getClass() == Hare.class) {
-                    byte block = worldMap.get(coordinate);
-                    if (block > BlockManager.LAND_BLOCK_ID) {
-                        animal.getState().increaseSatiety(10);
-                        //worldMap.set(coordinate, );
-                    }
-                } //else if (animalManager.getAnimal(coordinate).getClass())
-            }
-        }
+        animalManager.recalculate();
     }
 
     public CoordinateInfo getCoordinateInfo(Coordinate c) {
@@ -139,16 +121,18 @@ public class Game {
 
         Coordinate.foreachInRectangle(new Coordinate(0, 0), size, size, c -> {
             if (worldMap.get(c) == BlockManager.LAND_BLOCK_ID)
-                if (r.nextDouble()< GRASS_SPAWN_RATE)
+                if (r.nextDouble() < GRASS_SPAWN_RATE)
                     worldMap.set(c, GrassBlock.getYoung());
         });
 
         worldMap.setCallback(p -> update(p.getKey()));
         state = STATE_RUNNING;
+
     }
 
     private void update(Coordinate c) {
         if (worldChangeListener != null)
             worldChangeListener.success(c);
     }
+
 }

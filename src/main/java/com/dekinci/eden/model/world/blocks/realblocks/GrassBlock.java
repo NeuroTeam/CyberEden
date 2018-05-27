@@ -46,7 +46,7 @@ public class GrassBlock implements Block {
             return id;
 
         if (state > 0)
-            state++;
+            state--;
         return states[state];
     }
 

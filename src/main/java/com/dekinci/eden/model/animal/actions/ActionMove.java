@@ -43,6 +43,8 @@ public class ActionMove implements Action {
 
     @Override
     public void act(Coordinate coordinate) {
-        return ;
+        Coordinate next = nextCoordinate(coordinate);
+        coordinate.setX(next.getX());
+        coordinate.setY(next.getY());
     }
 }
