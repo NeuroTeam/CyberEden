@@ -26,12 +26,6 @@ public class WorldMap {
     private int radiusInChunks;
     private int radiusInBlocks;
 
-    private ResultCallback<Pair<Coordinate, Byte>> callback;
-
-    private Chunk getChunk(Coordinate pos) {
-        return chunkMap.get(getChunkId(pos));
-    }
-
     public WorldMap(int sizeInChunks) {
         this.sizeInChunks = sizeInChunks;
         this.sizeInBlocks = sizeInChunks * Chunk.SIZE;
@@ -39,10 +33,6 @@ public class WorldMap {
         radiusInChunks = sizeInChunks / 2;
 
         chunkMap = new ConcurrentHashMap<>(sizeInChunks * sizeInChunks);
-    }
-
-    public void setCallback(ResultCallback<Pair<Coordinate, Byte>> callback) {
-        this.callback = callback;
     }
 
     @Override
@@ -80,16 +70,10 @@ public class WorldMap {
         }
 
         chunk.setBlock(coordinate, block);
-        update(coordinate, block);
     }
 
     public int getChunkId(Coordinate c) {
         return (Math.floorDiv(c.getX(), Chunk.SIZE) << 16) + Math.floorDiv(c.getY(), Chunk.SIZE);
-    }
-
-    private void update(Coordinate c, byte id) {
-        if (callback != null)
-            callback.success(new Pair<>(c, id));
     }
 
     public BufferedImage toImage() {

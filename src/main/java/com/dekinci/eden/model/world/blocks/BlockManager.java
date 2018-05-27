@@ -1,5 +1,7 @@
 package com.dekinci.eden.model.world.blocks;
 
+import com.dekinci.eden.model.world.blocks.realblocks.GrassBlock;
+
 public class BlockManager {
     public static final byte VOID_BLOCK_ID = -1;
     public static final byte AIR_BLOCK_ID = 0;
@@ -15,4 +17,8 @@ public class BlockManager {
     public static final byte GRASS_5_BLOCK_ID = 9;
     public static final byte GRASS_6_BLOCK_ID = 10;
     public static final byte GRASS_7_BLOCK_ID = 11;
+
+    public static boolean isSolid(byte id) {
+        return GrassBlock.isGrass(id) || id == LAND_BLOCK_ID;
+    }
 }

@@ -1,5 +1,6 @@
 package com.dekinci.eden;
 
+import com.dekinci.eden.model.Game;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

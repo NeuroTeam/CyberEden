@@ -14,7 +14,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <BorderPane minHeight="340.0" minWidth="420.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dekinci.eden.gui.GameController">
    <center>
       <AnchorPane>
@@ -24,7 +23,21 @@
                   <Canvas fx:id="mapCanvas" height="200.0" width="200.0" />
                </children>
             </StackPane>
-            <Canvas fx:id="minimapCanvas" height="200.0" width="200.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+            <AnchorPane style="-fx-background-color: #ffffff;" AnchorPane.rightAnchor="0.0">
+               <children>
+                  <Canvas fx:id="minimapCanvas" height="200.0" width="200.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
+                  <HBox alignment="CENTER" style="-fx-background-color: #ffffff;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="205.0">
+                     <children>
+                        <Label text="Day">
+                           <HBox.margin>
+                              <Insets right="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Label fx:id="tickLabel" text="0" />
+                     </children>
+                  </HBox>
+               </children>
+            </AnchorPane>
             <VBox alignment="CENTER" style="-fx-background-color: #ffffff;" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="270.0">
                <children>
                   <Label text="INFO">

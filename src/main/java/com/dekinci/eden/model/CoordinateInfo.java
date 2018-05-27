@@ -1,26 +1,19 @@
 package com.dekinci.eden.model;
 
-import com.dekinci.eden.model.animal.Animal;
+import com.dekinci.eden.model.world.Cell;
 import com.dekinci.eden.model.world.Coordinate;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CoordinateInfo {
     private Coordinate coordinate;
     private int chunk;
     private int blockId;
+    private Cell cell;
 
-    private List<Animal> animals = new ArrayList<>();
-
-    public CoordinateInfo(Coordinate coordinate, byte blockId, int chunk) {
+    public CoordinateInfo(Coordinate coordinate, byte blockId, int chunk, Cell cell) {
         this.coordinate = coordinate;
         this.chunk = chunk;
         this.blockId = blockId;
-    }
-
-    public void addAnimal(Animal animal) {
-        animals.add(animal);
+        this.cell = cell;
     }
 
     public Coordinate getCoordinate() {
@@ -35,7 +28,7 @@ public class CoordinateInfo {
         return blockId;
     }
 
-    public List<Animal> getAnimals() {
-        return animals;
+    public Cell getCell() {
+        return cell;
     }
 }

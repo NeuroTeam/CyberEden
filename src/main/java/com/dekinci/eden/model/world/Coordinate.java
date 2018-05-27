@@ -52,6 +52,47 @@ public class Coordinate {
         return new Coordinate(x, y - 1);
     }
 
+    public Coordinate upRightTo() {
+        return new Coordinate(x + 1, y + 1);
+    }
+
+    public Coordinate upLeftTo() {
+        return new Coordinate(x - 1, y + 1);
+    }
+
+    public Coordinate downRightTo() {
+        return new Coordinate(x + 1, y - 1);
+    }
+
+    public Coordinate downLeftTo() {
+        return new Coordinate(x - 1, y - 1);
+    }
+
+    public Coordinate randomAround() {
+        Random r = new Random();
+        switch (r.nextInt(8)) {
+            case 0:
+                return rightTo();
+            case 1:
+                return leftTo();
+            case 2:
+                return upTo();
+            case 3:
+                return downTo();
+            case 4:
+                return upRightTo();
+            case 5:
+                return upLeftTo();
+            case 6:
+                return downRightTo();
+            case 7:
+                return downLeftTo();
+            default:
+                return this;
+        }
+    }
+
+
     public int getX() {
         return x;
     }
@@ -119,7 +160,7 @@ public class Coordinate {
                 consumer.accept(new Coordinate(iterX, iterY));
     }
 
-    public static Coordinate random(int worldSize){
+    public static Coordinate random(int worldSize) {
         Random random = new Random();
         return new Coordinate(random.nextInt(2 * worldSize) - worldSize, random.nextInt(2 * worldSize) - worldSize);
     }

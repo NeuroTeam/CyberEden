@@ -1,9 +1,11 @@
 package com.dekinci.eden.gui;
 
 import com.dekinci.eden.App;
-import com.dekinci.eden.Game;
+import com.dekinci.eden.model.AnimalManager;
+import com.dekinci.eden.model.Game;
 import com.dekinci.eden.model.CoordinateInfo;
 import com.dekinci.eden.model.animal.Animal;
+import com.dekinci.eden.model.world.Cell;
 import com.dekinci.eden.model.world.Coordinate;
 import com.dekinci.eden.model.world.WorldMap;
 import com.dekinci.eden.model.world.blocks.BlockManager;
@@ -54,9 +56,13 @@ public class GameController {
     @FXML
     ListView<Animal> viewEntitiesList;
 
+    @FXML
+    Label tickLabel;
+
     private Game game = App.getApp().getGame();
 
     private WorldMap worldMap = game.getWorldMap();
+    private AnimalManager animalManager = game.getAnimalManager();
 
     private Coordinate activeCoordinate = new Coordinate(0, 0);
 
@@ -64,6 +70,7 @@ public class GameController {
     private double tileScale = tileRes;
 
     private Timer clickTimer;
+    private int tickCounter;
 
     private Coordinate center = new Coordinate(0, 0);
 
@@ -84,7 +91,7 @@ public class GameController {
         mapCanvas.setOnMouseMoved(event -> {
             mouseX = event.getX();
             mouseY = event.getY();
-            calculateCurrentCoordinate();
+            calculateCurrentCoordinate(false);
         });
 
         graphicsContext = mapCanvas.getGraphicsContext2D();
@@ -99,26 +106,19 @@ public class GameController {
                         fireTick();
                     }
                 }, 400, 400);
-            } else
+            } else {
                 clickTimer.cancel();
+                clickTimer = null;
+            }
         });
 
         worldMap.set(new Coordinate(0, 0), GrassBlock.getYoung());
-        worldMap.setCallback(p -> Platform.runLater(() -> {
-            int w = (int) worldPane.getWidth() / tileRes;
-            int h = (int) worldPane.getHeight() / tileRes;
-
-            Coordinate start = new Coordinate(center.getX() - w / 2, center.getY() - h / 2);
-            if (worldMap != null)
-                drawTile(p.getKey().relativeTo(start), p.getValue());
-        }));
-
         GraphicsContext context = minimapCanvas.getGraphicsContext2D();
         context.drawImage(SwingFXUtils.toFXImage(worldMap.toImage(), null), 0, 0,
                 minimapCanvas.getWidth(), minimapCanvas.getHeight());
     }
 
-    private void calculateCurrentCoordinate() {
+    private void calculateCurrentCoordinate(boolean force) {
         int w = (int) worldPane.getWidth() / tileRes;
         int h = (int) worldPane.getHeight() / tileRes;
 
@@ -129,20 +129,30 @@ public class GameController {
         sY += (int) mouseY / tileRes;
 
         Coordinate s = new Coordinate(sX, sY);
-        if (!activeCoordinate.equals(s)) {
+        if (!activeCoordinate.equals(s) || force) {
             activeCoordinate = s;
             CoordinateInfo info = game.getCoordinateInfo(s);
             viewCoordinate.setText(activeCoordinate.toString());
             viewBlockId.setText(String.valueOf(info.getBlockId()));
             viewChunkId.setText(String.valueOf(info.getChunk()));
             viewEntitiesList.getItems().clear();
-            viewEntitiesList.getItems().addAll(info.getAnimals());
+
+            Cell cell = info.getCell();
+            if (cell != null)
+                for (Animal a : cell)
+                    viewEntitiesList.getItems().add(a);
         }
     }
 
     private void fireTick() {
-        game.tick();
-        System.out.println("Click");
+        Platform.runLater(() -> {
+            game.tick();
+            draw();
+            calculateCurrentCoordinate(true);
+            tickCounter++;
+            tickLabel.setText(String.valueOf(tickCounter));
+            System.out.println("Tick");
+        });
     }
 
     private void handlePressed(KeyEvent event) {
@@ -187,20 +197,20 @@ public class GameController {
             return;
 
         if (isUp && !isDown)
-            if (worldMap.get(Coordinate.sdownTo(center)) != BlockManager.VOID_BLOCK_ID)
-                center = Coordinate.sdownTo(center);
+            if (worldMap.get(center.downTo()) != BlockManager.VOID_BLOCK_ID)
+                center = center.downTo();
         if (isDown && !isUp)
-            if (worldMap.get(Coordinate.supTo(center)) != BlockManager.VOID_BLOCK_ID)
-                center = Coordinate.supTo(center);
+            if (worldMap.get(center.upTo()) != BlockManager.VOID_BLOCK_ID)
+                center = center.upTo();
         if (isLeft && !isRight)
-            if (worldMap.get(Coordinate.sleftTo(center)) != BlockManager.VOID_BLOCK_ID)
-                center = Coordinate.sleftTo(center);
+            if (worldMap.get(center.leftTo()) != BlockManager.VOID_BLOCK_ID)
+                center = center.leftTo();
         if (isRight && !isLeft)
-            if (worldMap.get(Coordinate.srightTo(center)) != BlockManager.VOID_BLOCK_ID)
-                center = Coordinate.srightTo(center);
+            if (worldMap.get(center.rightTo()) != BlockManager.VOID_BLOCK_ID)
+                center = center.rightTo();
 
         draw();
-        calculateCurrentCoordinate();
+        calculateCurrentCoordinate(false);
     }
 
     private void zoom(int delta) {
@@ -230,7 +240,7 @@ public class GameController {
 
         mapCanvas.setWidth(width);
         mapCanvas.setHeight(height);
-        calculateCurrentCoordinate();
+        calculateCurrentCoordinate(false);
     }
 
     private void clear() {
@@ -244,12 +254,24 @@ public class GameController {
 
         Coordinate start = new Coordinate(center.getX() - w / 2, center.getY() - h / 2);
         if (worldMap != null)
-            Coordinate.foreachInRectangle(center, w, h, (c) -> drawTile(c.relativeTo(start), worldMap.get(c)));
+            Coordinate.foreachInRectangle(center, w, h, (c) -> drawAll(c, c.relativeTo(start)));
+    }
+
+    private void drawAll(Coordinate c, Coordinate relative) {
+        drawTile(relative, worldMap.get(c));
+        drawCell(relative, animalManager.getCell(c));
     }
 
     private void drawTile(Coordinate relative, byte id) {
-        graphicsContext.drawImage(TextureManager.get(id), relative.getX() * tileRes, relative.getY() * tileRes,
-                tileRes, tileRes);
+        graphicsContext.drawImage(TextureManager.get(id),
+                relative.getX() * tileRes, relative.getY() * tileRes, tileRes, tileRes);
+    }
+
+    private void drawCell(Coordinate relative, Cell cell) {
+        if (cell != null)
+            for (Animal animal : cell)
+                graphicsContext.drawImage(TextureManager.getAnimal(animal.getSpecies()),
+                        relative.getX() * tileRes, relative.getY() * tileRes, tileRes, tileRes);
     }
 
 

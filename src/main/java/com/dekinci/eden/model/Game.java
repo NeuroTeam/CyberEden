@@ -1,29 +1,14 @@
-package com.dekinci.eden;
+package com.dekinci.eden.model;
 
-import com.dekinci.eden.GameUtils.AnimalManager;
-import com.dekinci.eden.GameUtils.CoordinatedAnimal;
-import com.dekinci.eden.model.CoordinateInfo;
-import com.dekinci.eden.model.animal.*;
-import com.dekinci.eden.model.animal.actions.*;
 import com.dekinci.eden.model.world.Coordinate;
 import com.dekinci.eden.model.world.WorldMap;
-import com.dekinci.eden.model.world.WorldSides;
 import com.dekinci.eden.model.world.blocks.BlockManager;
 import com.dekinci.eden.model.world.blocks.realblocks.GrassBlock;
-import com.dekinci.eden.utils.ResultCallback;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game {
-    private static final AtomicReference<Game> current = new AtomicReference<>(new Game());
-
-    public static Game current() {
-        return current.get();
-    }
-
     public static final int STATE_NOT_READY = 0;
     public static final int STATE_INITIALIZED = 1;
     public static final int STATE_READY = 2;
@@ -32,48 +17,33 @@ public class Game {
     public static final int STATE_STOPPING = 5;
     public static final int STATE_STOPPED = 6;
 
-    private static final double GRASS_SPAWN_RATE = 0.01;
-    private static final double GRASS_SPREAD_RATE = 0.03;
+    private static final double GRASS_SPAWN_RATE = 0.05;
+    private static final double GRASS_SPREAD_RATE = 0.05;
     private static final double GRASS_GROW_RATE = 0.2;
+    private static final double GRASS_SHRINK_RATE = 0.007;
 
     private WorldMap worldMap;
-    private ResultCallback<Coordinate> worldChangeListener;
-
-    private int initialNumOfAnimals = 16;
-
-    private int state = STATE_NOT_READY;
-
-    private List<CoordinatedAnimal> animals = new ArrayList<>(initialNumOfAnimals);
-
     private AnimalManager animalManager;
-
-    public void setWorldChangeListener(ResultCallback<Coordinate> listener) {
-        worldChangeListener = listener;
-    }
-
-    public void setAnimalManager() {
-        this.animalManager = new AnimalManager(animals, worldMap);
-    }
-
-    public void setAnimals() {
-        animalManager.setAnimals(initialNumOfAnimals);
-    }
+    private int state = STATE_NOT_READY;
 
     public void tick() {
         if (state != STATE_RUNNING)
             return;
 
         grassTick();
-        animalTick();
+        animalManager.tick();
     }
 
     private void grassTick() {
         Random r = new Random();
 
         Coordinate s = new Coordinate(0, 0);
-        Coordinate.foreachInRectangle(s, worldMap.getSizeInBlocks() / 2, worldMap.getSizeInBlocks() / 2, c -> {
+        Coordinate.foreachInRectangle(s, worldMap.getSizeInBlocks(), worldMap.getSizeInBlocks(), c -> {
             byte id = worldMap.get(c);
-            if (GrassBlock.isGrass(id)) {
+            if (GrassBlock.isGrass(id) && GrassBlock.stateById(id) != GrassBlock.maxState()) {
+                if (r.nextDouble() < GRASS_SHRINK_RATE)
+                    worldMap.set(c, GrassBlock.shrink(id));
+
                 if (r.nextDouble() < GRASS_GROW_RATE)
                     worldMap.set(c, GrassBlock.grow(id));
 
@@ -96,14 +66,13 @@ public class Game {
         });
     }
 
-    private void animalTick() {
-        animalManager.recalculate();
+    public AnimalManager getAnimalManager() {
+        return animalManager;
     }
 
     public CoordinateInfo getCoordinateInfo(Coordinate c) {
-        CoordinateInfo result = new CoordinateInfo(c, worldMap.get(c), worldMap.getChunkId(c));
-        //result add animals on c
-        return result;
+        return new CoordinateInfo(c, worldMap.get(c),
+                worldMap.getChunkId(c), animalManager.getCell(c));
     }
 
     public WorldMap getWorldMap() {
@@ -116,23 +85,21 @@ public class Game {
         this.worldMap = worldMap;
         state = STATE_READY;
         state = STATE_STARTING;
+        animalManager = new AnimalManager(worldMap);
+        addGrass();
+        animalManager.placeRandomly();
+        state = STATE_RUNNING;
+    }
+
+    private void addGrass() {
         int size = worldMap.getSizeInBlocks();
         Random r = new Random();
 
+        final AtomicInteger counter = new AtomicInteger();
         Coordinate.foreachInRectangle(new Coordinate(0, 0), size, size, c -> {
             if (worldMap.get(c) == BlockManager.LAND_BLOCK_ID)
-                if (r.nextDouble() < GRASS_SPAWN_RATE)
+                if (r.nextDouble() < GRASS_SPAWN_RATE + Math.pow(1.0 / counter.getAndIncrement(), 3))
                     worldMap.set(c, GrassBlock.getYoung());
         });
-
-        worldMap.setCallback(p -> update(p.getKey()));
-        state = STATE_RUNNING;
-
     }
-
-    private void update(Coordinate c) {
-        if (worldChangeListener != null)
-            worldChangeListener.success(c);
-    }
-
 }

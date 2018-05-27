@@ -1,13 +1,20 @@
 package com.dekinci.eden.model.animal;
 
-import com.dekinci.eden.model.animal.actions.Action;
-
 public interface Animal {
-    byte makeDecision(AnimalView view);
-    State getState();
     int getSight();
 
+    byte getSpecies();
+    boolean isVegetarian();
+    boolean eats(Animal animal);
+    void die();
+    void decHealth();
+    int getHp();
+    boolean alive();
+    void tick();
+    int getAge();
 
+    void incSatiety();
 
-
+    byte makeDecision(AnimalView view);
+    Animal breed(Animal animal);
 }

@@ -5,6 +5,8 @@ import javafx.scene.image.Image;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.dekinci.eden.model.animal.AnimalTypes.HARE;
+import static com.dekinci.eden.model.animal.AnimalTypes.WOLF;
 import static com.dekinci.eden.model.world.blocks.BlockManager.*;
 
 public class TextureManager {
@@ -19,8 +21,33 @@ public class TextureManager {
             textures.put(id, texture);
         }
 
+        return texture;
+    }
+
+    private static Map<Byte, Image> animalTextures = new HashMap<>();
+    public static Image getAnimal(byte species) {
+        Image texture = animalTextures.get(species);
+        if (texture == null) {
+            texture = new Image(animalFileById(species));
+            animalTextures.put(species, texture);
+        }
 
         return texture;
+    }
+
+    private static String animalFileById(int species) {
+        return "gui/tiles/" + speciesById(species) + ".png";
+    }
+
+    private static String speciesById(int species) {
+        switch (species) {
+            case WOLF:
+                return "wolf";
+            case HARE:
+                return "rabbit";
+            default:
+                throw new IllegalArgumentException("Can not resolve animal tile resource " + species);
+        }
     }
 
     private static String fileById(int id) {

@@ -47,7 +47,13 @@ public class GrassBlock implements Block {
 
         if (state > 0)
             state--;
+        else
+            return BlockManager.LAND_BLOCK_ID;
         return states[state];
+    }
+
+    public static byte maxState() {
+        return (byte) states.length;
     }
 
     public static byte stateById(byte id) {
