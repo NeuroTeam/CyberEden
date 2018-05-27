@@ -14,7 +14,7 @@ public class Chunk {
     protected Chunk() {
     }
 
-    public int getBlock(Coordinate c) {
+    public byte getBlock(Coordinate c) {
         return blocks[getPos(c)];
     }
 

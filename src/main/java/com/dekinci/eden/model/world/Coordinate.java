@@ -38,6 +38,10 @@ public class Coordinate {
         return Math.sqrt(x * x + y * y);
     }
 
+    public Coordinate relativeTo(Coordinate c) {
+        return new Coordinate(x - c.x, y - c.y);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)

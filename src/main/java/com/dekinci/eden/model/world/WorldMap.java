@@ -3,6 +3,8 @@ package com.dekinci.eden.model.world;
 import com.dekinci.eden.model.animal.AnimalView;
 import com.dekinci.eden.model.world.blocks.BlockManager;
 import com.dekinci.eden.model.world.chunk.Chunk;
+import com.dekinci.eden.utils.ResultCallback;
+import javafx.util.Pair;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +20,8 @@ public class WorldMap {
     private int radiusInChunks;
     private int radiusInBlocks;
 
+    private ResultCallback<Pair<Coordinate, Byte>> callback;
+
     public Chunk getChunk(Coordinate pos) {
         return chunkMap.get(getChunkId(pos));
     }
@@ -31,6 +35,10 @@ public class WorldMap {
         chunkMap = new ConcurrentHashMap<>(sizeInChunks * sizeInChunks);
     }
 
+    public void setCallback(ResultCallback<Pair<Coordinate, Byte>> callback) {
+        this.callback = callback;
+    }
+
     @Override
     public String toString() {
         return sizeInBlocks + ":" + chunkMap.toString();
@@ -40,12 +48,16 @@ public class WorldMap {
         return null;
     }
 
-    public int get(Coordinate coordinate) {
+    public byte get(Coordinate coordinate) {
         Chunk chunk = chunkMap.get(getChunkId(coordinate));
         if (chunk == null)
             return BlockManager.VOID_BLOCK_ID;
 
         return chunk.getBlock(coordinate);
+    }
+
+    public int getSizeInBlocks() {
+        return sizeInBlocks;
     }
 
     public boolean isBlock(Coordinate coordinate, byte block) {
@@ -62,10 +74,16 @@ public class WorldMap {
         }
 
         chunk.setBlock(coordinate, block);
+        update(coordinate, block);
     }
 
     private int getChunkId(Coordinate c) {
         return (Math.floorDiv(c.getX(), Chunk.SIZE) << 16) + Math.floorDiv(c.getY(), Chunk.SIZE);
+    }
+
+    private void update(Coordinate c, byte id) {
+        if (callback != null)
+            callback.success(new Pair<>(c, id));
     }
 }
 

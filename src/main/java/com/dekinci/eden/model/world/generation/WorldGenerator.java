@@ -5,8 +5,6 @@ import com.dekinci.eden.model.world.Spiral;
 import com.dekinci.eden.model.world.WorldMap;
 import com.dekinci.eden.model.world.blocks.BlockManager;
 import com.dekinci.eden.model.world.chunk.Chunk;
-import com.dekinci.eden.utils.ResultCallback;
-import javafx.util.Pair;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -23,8 +21,6 @@ public class WorldGenerator {
 
     WorldMap generatingWorld;
 
-    private ResultCallback<Pair<Coordinate, Byte>> callback;
-
     public WorldGenerator(int sizeinChunks) {
         this.sizeInBlocks = sizeinChunks * Chunk.SIZE;
         radiusBlock = sizeInBlocks / 2;
@@ -36,11 +32,6 @@ public class WorldGenerator {
 
     public WorldMap getWorld() {
         return generatingWorld;
-    }
-
-    public WorldGenerator setCallback(ResultCallback<Pair<Coordinate, Byte>> callback) {
-        this.callback = callback;
-        return this;
     }
 
     public WorldGenerator preparePlanet() {
@@ -64,10 +55,8 @@ public class WorldGenerator {
     private void fill(BiFunction<Integer, Integer, Byte> function) {
         Coordinate.foreachInRectangle(leftTop, rightBottom, c -> {
             Byte result = function.apply(c.getX(), c.getY());
-            if (result != null) {
+            if (result != null)
                 generatingWorld.set(c, result);
-                update(c, result);
-            }
         });
     }
 
@@ -84,7 +73,6 @@ public class WorldGenerator {
                 continue;
             visited.add(current);
             generatingWorld.set(current, blockId);
-            update(current, blockId);
             double probability = Math.pow((1 - current.hypotenuse() / radiusBlock), power) * distance;
 
             if (r.nextDouble() - probability < size && generatingWorld.isBlock(Coordinate.downTo(current), BlockManager.WATER_BLOCK_ID))
@@ -137,10 +125,5 @@ public class WorldGenerator {
             result++;
 
         return result;
-    }
-
-    private void update(Coordinate c, byte id) {
-        if (callback != null)
-            callback.success(new Pair<>(c, id));
     }
 }
