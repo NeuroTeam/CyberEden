@@ -8,6 +8,8 @@ import java.util.Map;
 import static com.dekinci.eden.model.world.blocks.BlockManager.*;
 
 public class TextureManager {
+    public static final int TILE_RES = 8;
+
     private static Map<Byte, Image> textures = new HashMap<>();
 
     public static Image get(byte id) {

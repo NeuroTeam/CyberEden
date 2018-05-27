@@ -306,15 +306,15 @@ public class MapGenController {
 
     private BufferedImage imageFromWorld(WorldMap worldMap) {
         int size = worldMap.getSizeInBlocks();
-        BufferedImage image = new BufferedImage(size * tileRes, size * tileRes, TYPE_RGB);
+        BufferedImage image = new BufferedImage(size * TextureManager.TILE_RES, size * TextureManager.TILE_RES, TYPE_RGB);
         Graphics g = image.getGraphics();
 
         Coordinate leftTop = new Coordinate(-size / 2, -size / 2);
         Coordinate rightBottom = new Coordinate(size / 2, size / 2);
         Coordinate.foreachInRectangle(leftTop, rightBottom, c -> g.drawImage(
                 SwingFXUtils.fromFXImage(TextureManager.get(worldMap.get(c)), null),
-                c.relativeTo(leftTop).getX() * tileRes, c.relativeTo(leftTop).getY() * tileRes,
-                tileRes, tileRes, null));
+                c.relativeTo(leftTop).getX() * TextureManager.TILE_RES, c.relativeTo(leftTop).getY() * TextureManager.TILE_RES,
+                TextureManager.TILE_RES, TextureManager.TILE_RES, null));
         g.dispose();
 
         return image;
