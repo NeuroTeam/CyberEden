@@ -2,6 +2,7 @@ package com.dekinci.eden;
 
 import com.dekinci.eden.GameUtils.AnimalManager;
 import com.dekinci.eden.GameUtils.Position;
+import com.dekinci.eden.model.CoordinateInfo;
 import com.dekinci.eden.model.animal.*;
 import com.dekinci.eden.model.animal.actions.*;
 import com.dekinci.eden.model.world.Coordinate;
@@ -37,11 +38,6 @@ public class Game {
     private int initialNumOfAnimals;
 
     private List<Position> animals = new ArrayList<>(initialNumOfAnimals);
-
-    public void createWorld(int size) {
-        WorldGenerator generator = new WorldGenerator(size);
-        worldMap = generator.getWorld();
-    }
 
     private AnimalManager animalManager = new AnimalManager(animals, worldMap, initialNumOfAnimals);
 
@@ -79,10 +75,17 @@ public class Game {
         }
     }
 
+    public CoordinateInfo getCoordinateInfo(Coordinate c) {
+        CoordinateInfo result = new CoordinateInfo(c, worldMap.get(c), worldMap.getChunkId(c));
+        //result add animals on c
+        return result;
+    }
 
     public WorldMap getWorldMap() {
         return worldMap;
     }
 
-
+    public void setWorldMap(WorldMap worldMap) {
+        this.worldMap = worldMap;
+    }
 }
