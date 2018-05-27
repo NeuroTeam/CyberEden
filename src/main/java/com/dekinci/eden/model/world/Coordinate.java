@@ -26,6 +26,10 @@ public class Coordinate {
         this.y = y;
     }
 
+    public boolean isInRectangle(Coordinate leftBottom, Coordinate rightTop) {
+        return x >= leftBottom.x && x < rightTop.x && y >= leftBottom.y && y < rightTop.y;
+    }
+
     public int getX() {
         return x;
     }

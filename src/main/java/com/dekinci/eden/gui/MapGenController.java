@@ -193,7 +193,6 @@ public class MapGenController {
     private void showMap() {
         resize();
         graphicsContext = mapCanvas.getGraphicsContext2D();
-        worldMap.setCallback(c -> drawTile(c.getKey().relativeTo(leftBottom), c.getValue()));
         draw();
     }
 
