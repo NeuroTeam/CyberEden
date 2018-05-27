@@ -26,6 +26,15 @@ public class Coordinate {
         this.y = y;
     }
 
+    public Coordinate(long lC) {
+        this.x = (int) (lC >> 32);
+        this.y = (int) lC;
+    }
+
+    public long toLong() {
+        return ((long) x << 32) | y;
+    }
+
     public boolean isInRectangle(Coordinate leftBottom, Coordinate rightTop) {
         return x >= leftBottom.x && x < rightTop.x && y >= leftBottom.y && y < rightTop.y;
     }
