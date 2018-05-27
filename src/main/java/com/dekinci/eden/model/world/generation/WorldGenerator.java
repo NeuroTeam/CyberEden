@@ -75,17 +75,17 @@ public class WorldGenerator {
             generatingWorld.set(current, blockId);
             double probability = Math.pow((1 - current.hypotenuse() / radiusBlock), power) * distance;
 
-            if (r.nextDouble() - probability < size && generatingWorld.isBlock(Coordinate.downTo(current), BlockManager.WATER_BLOCK_ID))
-                queue.add(Coordinate.downTo(current));
+            if (r.nextDouble() - probability < size && generatingWorld.isBlock(Coordinate.sdownTo(current), BlockManager.WATER_BLOCK_ID))
+                queue.add(Coordinate.sdownTo(current));
 
-            if (r.nextDouble() - probability < size && generatingWorld.isBlock(Coordinate.upTo(current), BlockManager.WATER_BLOCK_ID))
-                queue.add(Coordinate.upTo(current));
+            if (r.nextDouble() - probability < size && generatingWorld.isBlock(Coordinate.supTo(current), BlockManager.WATER_BLOCK_ID))
+                queue.add(Coordinate.supTo(current));
 
-            if (r.nextDouble() - probability < size && generatingWorld.isBlock(Coordinate.rightTo(current), BlockManager.WATER_BLOCK_ID))
-                queue.add(Coordinate.rightTo(current));
+            if (r.nextDouble() - probability < size && generatingWorld.isBlock(Coordinate.srightTo(current), BlockManager.WATER_BLOCK_ID))
+                queue.add(Coordinate.srightTo(current));
 
-            if (r.nextDouble() - probability < size && generatingWorld.isBlock(Coordinate.leftTo(current), BlockManager.WATER_BLOCK_ID))
-                queue.add(Coordinate.leftTo(current));
+            if (r.nextDouble() - probability < size && generatingWorld.isBlock(Coordinate.sleftTo(current), BlockManager.WATER_BLOCK_ID))
+                queue.add(Coordinate.sleftTo(current));
         }
     }
 
@@ -115,13 +115,13 @@ public class WorldGenerator {
 
     private int smoothProb(Coordinate coordinate) {
         int result = 0;
-        if (generatingWorld.isBlock(Coordinate.downTo(coordinate), BlockManager.LAND_BLOCK_ID))
+        if (generatingWorld.isBlock(Coordinate.sdownTo(coordinate), BlockManager.LAND_BLOCK_ID))
             result++;
-        if (generatingWorld.isBlock(Coordinate.upTo(coordinate), BlockManager.LAND_BLOCK_ID))
+        if (generatingWorld.isBlock(Coordinate.supTo(coordinate), BlockManager.LAND_BLOCK_ID))
             result++;
-        if (generatingWorld.isBlock(Coordinate.rightTo(coordinate), BlockManager.LAND_BLOCK_ID))
+        if (generatingWorld.isBlock(Coordinate.srightTo(coordinate), BlockManager.LAND_BLOCK_ID))
             result++;
-        if (generatingWorld.isBlock(Coordinate.leftTo(coordinate), BlockManager.LAND_BLOCK_ID))
+        if (generatingWorld.isBlock(Coordinate.sleftTo(coordinate), BlockManager.LAND_BLOCK_ID))
             result++;
 
         return result;

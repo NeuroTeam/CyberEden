@@ -175,17 +175,17 @@ public class MapGenController {
             return;
 
         if (isUp && !isDown)
-            if (worldMap.get(Coordinate.downTo(center)) != BlockManager.VOID_BLOCK_ID)
-                center = Coordinate.downTo(center);
+            if (worldMap.get(Coordinate.sdownTo(center)) != BlockManager.VOID_BLOCK_ID)
+                center = Coordinate.sdownTo(center);
         if (isDown && !isUp)
-            if (worldMap.get(Coordinate.upTo(center)) != BlockManager.VOID_BLOCK_ID)
-                center = Coordinate.upTo(center);
+            if (worldMap.get(Coordinate.supTo(center)) != BlockManager.VOID_BLOCK_ID)
+                center = Coordinate.supTo(center);
         if (isLeft && !isRight)
-            if (worldMap.get(Coordinate.leftTo(center)) != BlockManager.VOID_BLOCK_ID)
-                center = Coordinate.leftTo(center);
+            if (worldMap.get(Coordinate.sleftTo(center)) != BlockManager.VOID_BLOCK_ID)
+                center = Coordinate.sleftTo(center);
         if (isRight && !isLeft)
-            if (worldMap.get(Coordinate.rightTo(center)) != BlockManager.VOID_BLOCK_ID)
-                center = Coordinate.rightTo(center);
+            if (worldMap.get(Coordinate.srightTo(center)) != BlockManager.VOID_BLOCK_ID)
+                center = Coordinate.srightTo(center);
 
         draw();
     }

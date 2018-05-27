@@ -7,6 +7,7 @@ import com.dekinci.eden.model.animal.Animal;
 import com.dekinci.eden.model.world.Coordinate;
 import com.dekinci.eden.model.world.WorldMap;
 import com.dekinci.eden.model.world.blocks.BlockManager;
+import com.dekinci.eden.model.world.blocks.realblocks.GrassBlock;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -89,7 +90,6 @@ public class GameController {
         graphicsContext = mapCanvas.getGraphicsContext2D();
 
         tickButton.setOnMouseClicked(e -> fireTick());
-
         autotickButton.setOnAction(event -> {
             if (clickTimer == null) {
                 clickTimer = new Timer();
@@ -98,10 +98,20 @@ public class GameController {
                     public void run() {
                         fireTick();
                     }
-                }, 1000, 1000);
+                }, 400, 400);
             } else
                 clickTimer.cancel();
         });
+
+        worldMap.set(new Coordinate(0, 0), GrassBlock.getYoung());
+        worldMap.setCallback(p -> Platform.runLater(() -> {
+            int w = (int) worldPane.getWidth() / tileRes;
+            int h = (int) worldPane.getHeight() / tileRes;
+
+            Coordinate start = new Coordinate(center.getX() - w / 2, center.getY() - h / 2);
+            if (worldMap != null)
+                drawTile(p.getKey().relativeTo(start), p.getValue());
+        }));
 
         GraphicsContext context = minimapCanvas.getGraphicsContext2D();
         context.drawImage(SwingFXUtils.toFXImage(worldMap.toImage(), null), 0, 0,
@@ -131,10 +141,8 @@ public class GameController {
     }
 
     private void fireTick() {
-        Platform.runLater(() -> {
-            //        game.tick();
-            System.out.println("Click");
-        });
+        game.tick();
+        System.out.println("Click");
     }
 
     private void handlePressed(KeyEvent event) {
@@ -179,17 +187,17 @@ public class GameController {
             return;
 
         if (isUp && !isDown)
-            if (worldMap.get(Coordinate.downTo(center)) != BlockManager.VOID_BLOCK_ID)
-                center = Coordinate.downTo(center);
+            if (worldMap.get(Coordinate.sdownTo(center)) != BlockManager.VOID_BLOCK_ID)
+                center = Coordinate.sdownTo(center);
         if (isDown && !isUp)
-            if (worldMap.get(Coordinate.upTo(center)) != BlockManager.VOID_BLOCK_ID)
-                center = Coordinate.upTo(center);
+            if (worldMap.get(Coordinate.supTo(center)) != BlockManager.VOID_BLOCK_ID)
+                center = Coordinate.supTo(center);
         if (isLeft && !isRight)
-            if (worldMap.get(Coordinate.leftTo(center)) != BlockManager.VOID_BLOCK_ID)
-                center = Coordinate.leftTo(center);
+            if (worldMap.get(Coordinate.sleftTo(center)) != BlockManager.VOID_BLOCK_ID)
+                center = Coordinate.sleftTo(center);
         if (isRight && !isLeft)
-            if (worldMap.get(Coordinate.rightTo(center)) != BlockManager.VOID_BLOCK_ID)
-                center = Coordinate.rightTo(center);
+            if (worldMap.get(Coordinate.srightTo(center)) != BlockManager.VOID_BLOCK_ID)
+                center = Coordinate.srightTo(center);
 
         draw();
         calculateCurrentCoordinate();

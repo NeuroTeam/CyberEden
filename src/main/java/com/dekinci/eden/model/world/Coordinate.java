@@ -7,19 +7,23 @@ public class Coordinate {
 
     private int x = 0, y = 0;
 
-    public static Coordinate rightTo(Coordinate coordinate) {
+    @Deprecated
+    public static Coordinate srightTo(Coordinate coordinate) {
         return new Coordinate(coordinate.x + 1, coordinate.y);
     }
 
-    public static Coordinate leftTo(Coordinate coordinate) {
+    @Deprecated
+    public static Coordinate sleftTo(Coordinate coordinate) {
         return new Coordinate(coordinate.x - 1, coordinate.y);
     }
 
-    public static Coordinate upTo(Coordinate coordinate) {
+    @Deprecated
+    public static Coordinate supTo(Coordinate coordinate) {
         return new Coordinate(coordinate.x, coordinate.y + 1);
     }
 
-    public static Coordinate downTo(Coordinate coordinate) {
+    @Deprecated
+    public static Coordinate sdownTo(Coordinate coordinate) {
         return new Coordinate(coordinate.x, coordinate.y - 1);
     }
 
@@ -30,6 +34,22 @@ public class Coordinate {
 
     public boolean isInRectangle(Coordinate leftBottom, Coordinate rightTop) {
         return x >= leftBottom.x && x < rightTop.x && y >= leftBottom.y && y < rightTop.y;
+    }
+
+    public Coordinate rightTo() {
+        return new Coordinate(x + 1, y);
+    }
+
+    public Coordinate leftTo() {
+        return new Coordinate(x - 1, y);
+    }
+
+    public Coordinate upTo() {
+        return new Coordinate(x, y + 1);
+    }
+
+    public Coordinate downTo() {
+        return new Coordinate(x, y - 1);
     }
 
     public int getX() {
@@ -101,6 +121,6 @@ public class Coordinate {
 
     public static Coordinate random(int worldSize){
         Random random = new Random();
-        return new Coordinate(random.nextInt(worldSize), random.nextInt(worldSize));
+        return new Coordinate(random.nextInt(2 * worldSize) - worldSize, random.nextInt(2 * worldSize) - worldSize);
     }
 }

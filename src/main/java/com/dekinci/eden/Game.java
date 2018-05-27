@@ -1,7 +1,7 @@
 package com.dekinci.eden;
 
 import com.dekinci.eden.GameUtils.AnimalManager;
-import com.dekinci.eden.GameUtils.Position;
+import com.dekinci.eden.GameUtils.CoordinatedAnimal;
 import com.dekinci.eden.model.CoordinateInfo;
 import com.dekinci.eden.model.animal.*;
 import com.dekinci.eden.model.animal.actions.*;
@@ -10,11 +10,11 @@ import com.dekinci.eden.model.world.WorldMap;
 import com.dekinci.eden.model.world.WorldSides;
 import com.dekinci.eden.model.world.blocks.BlockManager;
 import com.dekinci.eden.model.world.blocks.realblocks.GrassBlock;
-import com.dekinci.eden.model.world.generation.WorldGenerator;
 import com.dekinci.eden.utils.ResultCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Game {
@@ -32,12 +32,18 @@ public class Game {
     public static final int STATE_STOPPING = 5;
     public static final int STATE_STOPPED = 6;
 
+    private static final double GRASS_SPAWN_RATE = 0.01;
+    private static final double GRASS_SPREAD_RATE = 0.03;
+    private static final double GRASS_GROW_RATE = 0.2;
+
     private WorldMap worldMap;
     private ResultCallback<Coordinate> worldChangeListener;
 
-    private int initialNumOfAnimals;
+    private int initialNumOfAnimals = 16;
 
-    private List<Position> animals = new ArrayList<>(initialNumOfAnimals);
+    private int state = STATE_NOT_READY;
+
+    private List<CoordinatedAnimal> animals = new ArrayList<>(initialNumOfAnimals);
 
     private AnimalManager animalManager = new AnimalManager(animals, worldMap, initialNumOfAnimals);
 
@@ -46,7 +52,44 @@ public class Game {
     }
 
     public void tick() {
-        for (Position pos : animals) {
+        if (state != STATE_RUNNING)
+            return;
+
+        grassTick();
+        //animalTick();
+    }
+
+    private void grassTick() {
+        Random r = new Random();
+
+        Coordinate s = new Coordinate(0, 0);
+        Coordinate.foreachInRectangle(s, worldMap.getSizeInBlocks() / 2, worldMap.getSizeInBlocks() / 2, c -> {
+            byte id = worldMap.get(c);
+            if (GrassBlock.isGrass(id)) {
+                if (r.nextDouble() < GRASS_GROW_RATE)
+                    worldMap.set(c, GrassBlock.grow(id));
+
+                if (worldMap.get(c.downTo()) == BlockManager.LAND_BLOCK_ID)
+                    if (r.nextDouble() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
+                        worldMap.set(c.downTo(), GrassBlock.getYoung());
+
+                if (worldMap.get(c.upTo()) == BlockManager.LAND_BLOCK_ID)
+                    if (r.nextDouble() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
+                        worldMap.set(c.upTo(), GrassBlock.getYoung());
+
+                if (worldMap.get(c.rightTo()) == BlockManager.LAND_BLOCK_ID)
+                    if (r.nextDouble() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
+                        worldMap.set(c.rightTo(), GrassBlock.getYoung());
+
+                if (worldMap.get(c.leftTo()) == BlockManager.LAND_BLOCK_ID)
+                    if (r.nextDouble() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
+                        worldMap.set(c.leftTo(), GrassBlock.getYoung());
+            }
+        });
+    }
+
+    private void animalTick() {
+        for (CoordinatedAnimal pos : animals) {
             Animal animal = pos.getAnimal();
             Coordinate coordinate = pos.getCoordinate();
             switch (animal.makeDecision(worldMap.getView(coordinate, animal.getSight()))) {
@@ -86,6 +129,26 @@ public class Game {
     }
 
     public void setWorldMap(WorldMap worldMap) {
+        state = STATE_INITIALIZED;
+        state = STATE_NOT_READY;
         this.worldMap = worldMap;
+        state = STATE_READY;
+        state = STATE_STARTING;
+        int size = worldMap.getSizeInBlocks();
+        Random r = new Random();
+
+        Coordinate.foreachInRectangle(new Coordinate(0, 0), size, size, c -> {
+            if (worldMap.get(c) == BlockManager.LAND_BLOCK_ID)
+                if (r.nextDouble()< GRASS_SPAWN_RATE)
+                    worldMap.set(c, GrassBlock.getYoung());
+        });
+
+        worldMap.setCallback(p -> update(p.getKey()));
+        state = STATE_RUNNING;
+    }
+
+    private void update(Coordinate c) {
+        if (worldChangeListener != null)
+            worldChangeListener.success(c);
     }
 }

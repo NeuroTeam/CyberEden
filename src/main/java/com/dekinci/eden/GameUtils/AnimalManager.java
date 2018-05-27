@@ -13,11 +13,11 @@ import java.util.List;
 
 public class AnimalManager {
 
-    private List<Position> animals;
+    private List<CoordinatedAnimal> animals;
     private WorldMap worldMap;
     int initialNumOfAnimals;
 
-    public AnimalManager(List<Position> animals, WorldMap worldMap, int initialNumOfAnimals) {
+    public AnimalManager(List<CoordinatedAnimal> animals, WorldMap worldMap, int initialNumOfAnimals) {
         this.animals = animals;
         this.initialNumOfAnimals = initialNumOfAnimals;
         this.worldMap = worldMap;
@@ -31,15 +31,15 @@ public class AnimalManager {
         for (int i = 0; i < initialNumOfAnimals; i += 2) {
             Coordinate newCoord = Coordinate.random(worldMap.getSizeInBlocks());
             if (worldMap.get(newCoord) > BlockManager.WATER_BLOCK_ID)
-                animals.add(new Position(wolfFactory.create(), newCoord));
+                animals.add(new CoordinatedAnimal(wolfFactory.create(), newCoord));
             newCoord = Coordinate.random(worldMap.getSizeInBlocks());
             if (worldMap.get(newCoord) > BlockManager.WATER_BLOCK_ID)
-                animals.add(new Position(hareFactory.create(), newCoord));
+                animals.add(new CoordinatedAnimal(hareFactory.create(), newCoord));
         }
     }
 
     private void addAnimal(Coordinate coordinate, AnimalFactory animalFactory) {
-        animals.add(new Position(animalFactory.create(), coordinate));
+        animals.add(new CoordinatedAnimal(animalFactory.create(), coordinate));
     }
 
     public void addWolf(Coordinate coordinate) {
@@ -51,7 +51,7 @@ public class AnimalManager {
     }
 
     public Animal getAnimal(Coordinate coordinate) {
-        for (Position pos : animals) {
+        for (CoordinatedAnimal pos : animals) {
             if (pos.getCoordinate().equals(coordinate)) return pos.getAnimal();
         }
         return null;
