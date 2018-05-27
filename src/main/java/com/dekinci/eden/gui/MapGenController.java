@@ -1,11 +1,13 @@
 package com.dekinci.eden.gui;
 
+import com.dekinci.eden.App;
 import com.dekinci.eden.model.world.Coordinate;
 import com.dekinci.eden.model.world.WorldMap;
 import com.dekinci.eden.model.world.blocks.BlockManager;
 import com.dekinci.eden.model.world.generation.WorldGenerator;
 import com.dekinci.eden.utils.AsyncTask;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -85,6 +87,11 @@ public class MapGenController {
         worldPane.widthProperty().addListener((observable, oldValue, newValue) -> resizeAndDraw());
         worldPane.heightProperty().addListener((observable, oldValue, newValue) -> resizeAndDraw());
         worldPane.setOnScroll(event -> zoom((int) event.getDeltaY()));  //One piece is 40
+    }
+
+    @FXML
+    private void backToMenu(ActionEvent event) {
+        App.getApp().showMainMenu();
     }
 
     private void zoom(int delta) {
