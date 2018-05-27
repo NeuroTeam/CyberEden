@@ -46,8 +46,8 @@
                   <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
                </padding>
             </HBox>
-            <Canvas fx:id="minimapCanvas" height="200.0" width="200.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-            <VBox alignment="TOP_CENTER" prefWidth="130.0" style="-fx-background-color: #ffffff;" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="50.0">
+            <Canvas fx:id="minimapCanvas" height="250.0" width="250.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+            <VBox alignment="TOP_CENTER" prefWidth="130.0" style="-fx-background-color: #d3d3d3;" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
                <children>
                   <HBox alignment="TOP_CENTER">
                      <children>
@@ -118,11 +118,6 @@
                   </Slider>
                </children>
             </VBox>
-            <Button ellipsisString="" mnemonicParsing="false" onAction="#backToMenu" prefHeight="40.0" prefWidth="40.0" text="☰" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="5.0">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Button>
          </children>
          <BorderPane.margin>
             <Insets />

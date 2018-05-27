@@ -5,6 +5,6 @@ import com.dekinci.eden.model.world.Coordinate;
 public class ActionBreed implements Action {
     @Override
     public void act(Coordinate coordinate) {
-
+        
     }
 }

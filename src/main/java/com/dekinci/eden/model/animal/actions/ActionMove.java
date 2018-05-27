@@ -10,41 +10,39 @@ public class ActionMove implements Action {
         this.direction = direction;
     }
 
-    @Override
-    public void act(Coordinate coordinate) {
+    public int getDirection() {
+        return direction;
+    }
 
-        int y = coordinate.getY();
+    public Coordinate nextCoordinate(Coordinate coordinate) {
+
         int x = coordinate.getX();
+        int y = coordinate.getY();
 
         switch (direction) {
             case WorldSides.NORTH:
-                coordinate.setY(y + 1);
-                break;
+                return new Coordinate(x, y + 1);
             case WorldSides.NORTHEAST:
-                coordinate.setY(y + 1);
-                coordinate.setX(x + 1);
-                break;
+                return new Coordinate(x + 1, y + 1);
             case WorldSides.EAST:
-                coordinate.setX(x + 1);
-                break;
+                return new Coordinate(x, y + 1);
             case WorldSides.SOUTHEAST:
-                coordinate.setY(y - 1);
-                coordinate.setX(x + 1);
-                break;
+                return new Coordinate(x + 1, y - 1);
             case WorldSides.SOUTH:
-                coordinate.setY(y - 1);
-                break;
+                return new Coordinate(x, y - 1);
             case WorldSides.SOUTHWEST:
-                coordinate.setY(y - 1);
-                coordinate.setX(x - 1);
-                break;
+                return new Coordinate(x - 1, y - 1);
             case WorldSides.WEST:
-                coordinate.setX(x - 1);
-                break;
+                return new Coordinate(x - 1, y);
             case WorldSides.NORTHWEST:
-                coordinate.setY(y + 1);
-                coordinate.setX(x - 1);
-                break;
+                return new Coordinate(x - 1, y + 1);
         }
+        return coordinate;
+    }
+
+
+    @Override
+    public void act(Coordinate coordinate) {
+        return ;
     }
 }

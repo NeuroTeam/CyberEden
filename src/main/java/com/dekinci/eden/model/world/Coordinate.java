@@ -1,8 +1,10 @@
 package com.dekinci.eden.model.world;
 
+import java.util.Random;
 import java.util.function.Consumer;
 
 public class Coordinate {
+
     private int x = 0, y = 0;
 
     public static Coordinate rightTo(Coordinate coordinate) {
@@ -24,15 +26,6 @@ public class Coordinate {
     public Coordinate(int x, int y) {
         this.x = x;
         this.y = y;
-    }
-
-    public Coordinate(long lC) {
-        this.x = (int) (lC >> 32);
-        this.y = (int) lC;
-    }
-
-    public long toLong() {
-        return ((long) x << 32) | y;
     }
 
     public boolean isInRectangle(Coordinate leftBottom, Coordinate rightTop) {
@@ -94,15 +87,8 @@ public class Coordinate {
                 consumer.accept(new Coordinate(iterX, iterY));
     }
 
-    public static void foreachInRectangle(Coordinate center, int width, int height, Consumer<Coordinate> consumer) {
-        int sX = center.x - width / 2;
-        int eX = center.x + width / 2;
-
-        int sY = center.y - height / 2;
-        int eY = center.y + height / 2;
-
-        for (int iterX = sX; iterX < eX; iterX++)
-            for (int iterY = sY; iterY < eY; iterY++)
-                consumer.accept(new Coordinate(iterX, iterY));
+    public static Coordinate random(int worldSize){
+        Random random = new Random();
+        return new Coordinate(random.nextInt(worldSize), random.nextInt(worldSize));
     }
 }
