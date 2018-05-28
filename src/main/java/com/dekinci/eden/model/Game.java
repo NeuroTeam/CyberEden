@@ -3,7 +3,7 @@ package com.dekinci.eden.model;
 import com.dekinci.eden.model.world.Coordinate;
 import com.dekinci.eden.model.world.WorldMap;
 import com.dekinci.eden.model.world.blocks.BlockManager;
-import com.dekinci.eden.model.world.blocks.realblocks.GrassBlock;
+import com.dekinci.eden.model.world.blocks.GrassBlock;
 
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;

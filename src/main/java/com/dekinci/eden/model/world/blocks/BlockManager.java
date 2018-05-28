@@ -1,7 +1,5 @@
 package com.dekinci.eden.model.world.blocks;
 
-import com.dekinci.eden.model.world.blocks.realblocks.GrassBlock;
-
 public class BlockManager {
     public static final byte VOID_BLOCK_ID = -1;
     public static final byte AIR_BLOCK_ID = 0;

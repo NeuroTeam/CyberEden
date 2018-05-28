@@ -1,11 +1,13 @@
 package com.dekinci.eden.model;
 
 import com.dekinci.eden.model.animal.*;
+import com.dekinci.eden.model.animal.ai.AnimalVision;
+import com.dekinci.eden.model.animal.ai.VisionFactory;
 import com.dekinci.eden.model.world.Cell;
 import com.dekinci.eden.model.world.Coordinate;
 import com.dekinci.eden.model.world.WorldMap;
 import com.dekinci.eden.model.world.blocks.BlockManager;
-import com.dekinci.eden.model.world.blocks.realblocks.GrassBlock;
+import com.dekinci.eden.model.world.blocks.GrassBlock;
 
 
 import java.util.*;
@@ -15,6 +17,7 @@ import java.util.function.Supplier;
 
 import static com.dekinci.eden.model.animal.Decisions.*;
 import static com.dekinci.eden.model.animal.Decisions.DO_NOTHING;
+import static java.lang.Math.*;
 
 public class AnimalManager {
     private static final double WOLF_SPAWN_RATE = 0.005;
@@ -68,7 +71,7 @@ public class AnimalManager {
             Coordinate c = entry.getKey();
             for (Animal animal : cell) {
                 animal.tick();
-                switch (animal.makeDecision(worldMap.getView(c, animal.getSight()))) {
+                switch (animal.makeDecision(getAnimalVision(c, animal.getSight()))) {
                     case BREED:
                         breed(animal, cell, c);
                         break;
@@ -105,6 +108,13 @@ public class AnimalManager {
             }
         }
         commitTransaction();
+    }
+
+    private AnimalVision getAnimalVision(Coordinate c, int animalSight) {
+        VisionFactory factory = new VisionFactory(worldMap, this, c, animalSight);
+        return new AnimalVision(factory.seeGrass(), factory.seeAnimals(AnimalTypes.HARE),
+                factory.seeAnimals(AnimalTypes.WOLF), factory.seeBlocks(BlockManager.LAND_BLOCK_ID),
+                factory.seeBlocks(BlockManager.WATER_BLOCK_ID));
     }
 
     private void breed(Animal animal, Cell cell, Coordinate c) {

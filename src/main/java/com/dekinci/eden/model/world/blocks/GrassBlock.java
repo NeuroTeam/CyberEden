@@ -1,11 +1,6 @@
-package com.dekinci.eden.model.world.blocks.realblocks;
+package com.dekinci.eden.model.world.blocks;
 
-import com.dekinci.eden.model.world.blocks.Block;
-import com.dekinci.eden.model.world.blocks.BlockManager;
-
-import java.util.Arrays;
-
-public class GrassBlock implements Block {
+public class GrassBlock {
     private final static byte[] states = {
             BlockManager.GRASS_0_BLOCK_ID,
             BlockManager.GRASS_1_BLOCK_ID,
@@ -19,11 +14,6 @@ public class GrassBlock implements Block {
 
     public static boolean isGrass(byte id) {
         return stateById(id) != -1;
-    }
-
-    @Override
-    public byte getId() {
-        return states[0];
     }
 
     public static byte getYoung() {

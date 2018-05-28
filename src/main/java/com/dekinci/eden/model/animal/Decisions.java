@@ -1,6 +1,8 @@
 package com.dekinci.eden.model.animal;
 
 public class Decisions {
+    public static final int DECISIONS_AMOUNT = 11;
+
     public static final byte MOVE_TS = 0;
     public static final byte MOVE_TR = 1;
 

@@ -1,12 +1,8 @@
 package com.dekinci.eden.model.world;
 
 import com.dekinci.eden.gui.TextureManager;
-import com.dekinci.eden.model.animal.AnimalView;
 import com.dekinci.eden.model.world.blocks.BlockManager;
-import com.dekinci.eden.model.world.chunk.Chunk;
-import com.dekinci.eden.utils.ResultCallback;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.util.Pair;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -38,10 +34,6 @@ public class WorldMap {
     @Override
     public String toString() {
         return sizeInBlocks + ":" + chunkMap.toString();
-    }
-
-    public AnimalView getView(Coordinate coordinate, int radius) {
-        return null;
     }
 
     public byte get(Coordinate coordinate) {

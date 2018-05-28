@@ -1,5 +1,9 @@
 package com.dekinci.eden.model.animal;
 
+import com.dekinci.eden.model.animal.ai.AnimalVision;
+import com.dekinci.eden.model.animal.ai.Brain;
+import com.dekinci.eden.model.animal.ai.Genotype;
+
 import java.util.Random;
 
 
@@ -10,6 +14,16 @@ public class Wolf implements Animal {
     private int satiety = 10;
     private int hp = 100;
     private int age;
+
+    private Brain brain;
+
+    public Wolf() {
+        brain = new Brain();
+    }
+
+    private Wolf(Brain brain) {
+        this.brain = brain;
+    }
 
     @Override
     public byte getSpecies() {
@@ -67,13 +81,23 @@ public class Wolf implements Animal {
     }
 
     @Override
-    public byte makeDecision(AnimalView view) {
+    public byte makeDecision(AnimalVision view) {
+//        return brain.makeDecision(view);
         return (byte) new Random().nextInt(11);
     }
 
     @Override
+    public Genotype getGenotype() {
+        return new Genotype(null);
+    }
+
+    @Override
     public Animal breed(Animal animal) {
-        return new Wolf();
+        if (!(animal instanceof Wolf))
+            throw new IllegalStateException("Wrong breed type");
+        Wolf wolf = (Wolf) animal;
+
+        return new Wolf(brain.breed(wolf.brain));
     }
 
     @Override

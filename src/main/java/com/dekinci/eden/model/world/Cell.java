@@ -27,6 +27,10 @@ public class Cell implements Iterable<Animal> {
         return false;
     }
 
+    public boolean contains(int species) {
+        return a1 != null && a1.getSpecies() == species || a2 != null && a2.getSpecies() == species;
+    }
+
     public boolean isActive() {
         return a1 != null && a1.alive() || a2 != null && a2.alive();
     }

@@ -4,7 +4,7 @@ import com.dekinci.eden.model.world.Coordinate;
 import com.dekinci.eden.model.world.Spiral;
 import com.dekinci.eden.model.world.WorldMap;
 import com.dekinci.eden.model.world.blocks.BlockManager;
-import com.dekinci.eden.model.world.chunk.Chunk;
+import com.dekinci.eden.model.world.Chunk;
 
 import java.util.*;
 import java.util.function.BiFunction;

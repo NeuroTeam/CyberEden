@@ -1,5 +1,8 @@
 package com.dekinci.eden.model.animal;
 
+import com.dekinci.eden.model.animal.ai.AnimalVision;
+import com.dekinci.eden.model.animal.ai.Genotype;
+
 public interface Animal {
     int getSight();
 
@@ -15,6 +18,8 @@ public interface Animal {
 
     void incSatiety();
 
-    byte makeDecision(AnimalView view);
+    byte makeDecision(AnimalVision view);
     Animal breed(Animal animal);
+
+    Genotype getGenotype();
 }

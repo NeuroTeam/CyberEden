@@ -1,6 +1,4 @@
-package com.dekinci.eden.model.world.chunk;
-
-import com.dekinci.eden.model.world.Coordinate;
+package com.dekinci.eden.model.world;
 
 public class Chunk {
     public static final int SIZE = 32;

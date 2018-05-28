@@ -9,7 +9,7 @@ import com.dekinci.eden.model.world.Cell;
 import com.dekinci.eden.model.world.Coordinate;
 import com.dekinci.eden.model.world.WorldMap;
 import com.dekinci.eden.model.world.blocks.BlockManager;
-import com.dekinci.eden.model.world.blocks.realblocks.GrassBlock;
+import com.dekinci.eden.model.world.blocks.GrassBlock;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
