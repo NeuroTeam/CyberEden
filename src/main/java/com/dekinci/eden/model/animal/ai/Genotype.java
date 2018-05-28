@@ -26,7 +26,8 @@ public class Genotype {
 
     private Genotype crossover(Genotype other) {
         Random r = new Random();
-        int div = (int) (r.nextGaussian() * genes.length * Short.SIZE);
+
+        int div = ((int)(r.nextGaussian()+1)/2) * genes.length * Short.SIZE;
 
         int arrDiv = div / Short.SIZE;
         int numDiv = div % Short.SIZE;

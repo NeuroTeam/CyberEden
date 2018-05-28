@@ -8,6 +8,7 @@ import com.dekinci.eden.model.world.blocks.GrassBlock;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
+
 public class Game {
     public static final int STATE_NOT_READY = 0;
     public static final int STATE_INITIALIZED = 1;
@@ -22,9 +23,13 @@ public class Game {
     private static final double GRASS_GROW_RATE = 0.2;
     private static final double GRASS_SHRINK_RATE = 0.007;
 
+    private int day = 1;
+
     private WorldMap worldMap;
     private AnimalManager animalManager;
     private int state = STATE_NOT_READY;
+
+    private int yearLength = 365;
 
     public void tick() {
         if (state != STATE_RUNNING)
@@ -65,6 +70,7 @@ public class Game {
             }
         });
     }
+    
 
     public AnimalManager getAnimalManager() {
         return animalManager;
