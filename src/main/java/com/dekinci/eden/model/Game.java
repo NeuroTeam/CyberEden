@@ -1,6 +1,7 @@
 package com.dekinci.eden.model;
 
 import com.dekinci.eden.model.world.Coordinate;
+import com.dekinci.eden.model.world.Season;
 import com.dekinci.eden.model.world.WorldMap;
 import com.dekinci.eden.model.world.blocks.BlockManager;
 import com.dekinci.eden.model.world.blocks.GrassBlock;
@@ -25,7 +26,8 @@ public class Game {
     private AnimalManager animalManager;
     private int state = STATE_NOT_READY;
 
-    private int yearLength = 365;
+    private static final int yearLength = 100;
+    private static final int periodLength = yearLength / 4;
 
     public void tick() {
         if (state != STATE_RUNNING)
@@ -33,6 +35,15 @@ public class Game {
 
         grassTick();
         animalManager.tick();
+        day++;
+    }
+
+    public int getDay() {
+        return day;
+    }
+
+    public Season getSeason() {
+        return Season.getById(day / periodLength);
     }
 
     private void grassTick() {
@@ -42,25 +53,25 @@ public class Game {
         Coordinate.foreachInRectangle(s, worldMap.getSizeInBlocks(), worldMap.getSizeInBlocks(), c -> {
             byte id = worldMap.get(c);
             if (GrassBlock.isGrass(id) && GrassBlock.stateById(id) != GrassBlock.maxState()) {
-                if (r.nextDouble() < GRASS_SHRINK_RATE)
+                if (r.nextDouble() < GRASS_SHRINK_RATE * getGrassMultiplier())
                     worldMap.set(c, GrassBlock.shrink(id));
 
-                if (r.nextDouble() < GRASS_GROW_RATE)
+                if (r.nextDouble() < GRASS_GROW_RATE * getGrassMultiplier())
                     worldMap.set(c, GrassBlock.grow(id));
 
-                if (worldMap.get(c.downTo()) == BlockManager.LAND_BLOCK_ID)
+                if (worldMap.get(c.downTo()) == BlockManager.LAND_BLOCK_ID * getGrassMultiplier())
                     if (r.nextDouble() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
                         worldMap.set(c.downTo(), GrassBlock.getYoung());
 
-                if (worldMap.get(c.upTo()) == BlockManager.LAND_BLOCK_ID)
+                if (worldMap.get(c.upTo()) == BlockManager.LAND_BLOCK_ID * getGrassMultiplier())
                     if (r.nextDouble() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
                         worldMap.set(c.upTo(), GrassBlock.getYoung());
 
-                if (worldMap.get(c.rightTo()) == BlockManager.LAND_BLOCK_ID)
+                if (worldMap.get(c.rightTo()) == BlockManager.LAND_BLOCK_ID * getGrassMultiplier())
                     if (r.nextDouble() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
                         worldMap.set(c.rightTo(), GrassBlock.getYoung());
 
-                if (worldMap.get(c.leftTo()) == BlockManager.LAND_BLOCK_ID)
+                if (worldMap.get(c.leftTo()) == BlockManager.LAND_BLOCK_ID * getGrassMultiplier())
                     if (r.nextDouble() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
                         worldMap.set(c.leftTo(), GrassBlock.getYoung());
             }
@@ -100,8 +111,12 @@ public class Game {
         final AtomicInteger counter = new AtomicInteger();
         Coordinate.foreachInRectangle(new Coordinate(0, 0), size, size, c -> {
             if (worldMap.get(c) == BlockManager.LAND_BLOCK_ID)
-                if (r.nextDouble() < GRASS_SPAWN_RATE + Math.pow(1.0 / counter.getAndIncrement(), 3))
+                if (r.nextDouble() < GRASS_SPAWN_RATE * getGrassMultiplier() + Math.pow(1.0 / counter.getAndIncrement(), 3))
                     worldMap.set(c, GrassBlock.getYoung());
         });
+    }
+
+    private double getGrassMultiplier() {
+        return 0.5 + Math.cos(Math.PI * (2 * ((periodLength + day) % yearLength) / (double) yearLength - 1) / 2);
     }
 }

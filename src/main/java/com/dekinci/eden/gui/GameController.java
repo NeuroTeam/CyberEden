@@ -20,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.effect.Effect;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -66,12 +67,13 @@ public class GameController {
     private double tileScale = tileRes;
 
     private Timer clickTimer;
-    private int tickCounter;
 
     private Coordinate center = new Coordinate(0, 0);
 
     private double mouseX, mouseY;
     private boolean isUp, isDown, isRight, isLeft;
+
+    private Effect seasonEffect = game.getSeason().getRelatedEffect();
 
     @FXML
     public void initialize() {
@@ -112,6 +114,8 @@ public class GameController {
         GraphicsContext context = minimapCanvas.getGraphicsContext2D();
         context.drawImage(SwingFXUtils.toFXImage(worldMap.toImage(), null), 0, 0,
                 minimapCanvas.getWidth(), minimapCanvas.getHeight());
+
+        updateEffect();
     }
 
     private void calculateCurrentCoordinate(boolean force) {
@@ -145,10 +149,19 @@ public class GameController {
             game.tick();
             draw();
             calculateCurrentCoordinate(true);
-            tickCounter++;
-            tickLabel.setText(String.valueOf(tickCounter));
+            tickLabel.setText(String.valueOf(game.getDay()));
             System.out.println("Tick");
+
+            Effect se = game.getSeason().getRelatedEffect();
+            if (se != null && !se.equals(seasonEffect)) {
+                seasonEffect = se;
+                updateEffect();
+            }
         });
+    }
+
+    private void updateEffect() {
+//        mapCanvas.setEffect(seasonEffect); //TODO
     }
 
     private void handlePressed(KeyEvent event) {
