@@ -26,7 +26,7 @@ public class Game {
     private AnimalManager animalManager;
     private int state = STATE_NOT_READY;
 
-    private static final int yearLength = 100;
+    private static final int yearLength = 400;
     private static final int periodLength = yearLength / 4;
 
     public void tick() {
