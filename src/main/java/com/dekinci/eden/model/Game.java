@@ -8,6 +8,7 @@ import com.dekinci.eden.model.world.blocks.GrassBlock;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.dekinci.eden.model.Settings.*;
 
 public class Game {
     public static final int STATE_NOT_READY = 0;
@@ -17,11 +18,6 @@ public class Game {
     public static final int STATE_RUNNING = 4;
     public static final int STATE_STOPPING = 5;
     public static final int STATE_STOPPED = 6;
-
-    private static final double GRASS_SPAWN_RATE = 0.05;
-    private static final double GRASS_SPREAD_RATE = 0.05;
-    private static final double GRASS_GROW_RATE = 0.2;
-    private static final double GRASS_SHRINK_RATE = 0.007;
 
     private int day = 1;
 
@@ -70,7 +66,7 @@ public class Game {
             }
         });
     }
-    
+
 
     public AnimalManager getAnimalManager() {
         return animalManager;

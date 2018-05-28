@@ -1,6 +1,7 @@
 package com.dekinci.eden.utils;
 
 import java.util.Objects;
+import java.util.Random;
 import java.util.function.Consumer;
 
 public class Utils {

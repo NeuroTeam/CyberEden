@@ -2,100 +2,132 @@ package com.dekinci.eden.model.animal.ai;
 
 import java.util.Random;
 
-import static com.dekinci.eden.model.animal.ai.DoubleToGrayCode.*;
+import static com.dekinci.eden.model.Settings.NETWORK_DEPTH;
+import static com.dekinci.eden.model.Settings.SIGMA_COEFFICIENT;
+import static com.dekinci.eden.model.animal.ai.DoubleToGrayCode.doubleToGC;
+import static com.dekinci.eden.model.animal.ai.DoubleToGrayCode.gCToDouble;
 
 public class NeuralNetwork {
-    private static final int depth = 1; //INNER LAYERS
 
     private double[][] inputLayer;
     private double[][][] innerLayers;
     private double[][] outputLayer;
 
-    private int inputAmount;
-    private int innerAmount;
-    private int outputAmount;
+    private int inputSize;
+    private int innerSize;
+    private int outputSize;
 
-    public NeuralNetwork(int inputAmount, int outputAmount) {
-        this.inputAmount = inputAmount;
-        innerAmount = (inputAmount + outputAmount);
-        this.outputAmount = outputAmount;
+    public NeuralNetwork(int inputSize, int outputSize) {
+        this.inputSize = inputSize;
+        innerSize = (inputSize + outputSize) / 2;
+        this.outputSize = outputSize;
 
-        inputLayer = new double[inputAmount][innerAmount];
-        innerLayers = new double[depth - 1][innerAmount][innerAmount];
-        outputLayer = new double[innerAmount][outputAmount];
+        inputLayer = new double[inputSize][innerSize];
+        innerLayers = new double[NETWORK_DEPTH][innerSize][innerSize];
+        outputLayer = new double[innerSize][outputSize];
 
         Random r = new Random();
-        for (int i = 0; i < inputAmount; i++)
-            for (int j = 0; j < innerAmount; j++)
-                inputLayer[i][j] = r.nextGaussian() - 1;
+        for (int i = 0; i < inputSize; i++)
+            for (int j = 0; j < innerSize; j++)
+                inputLayer[i][j] = r.nextGaussian() / 2;
 
-        for (int k = 0; k < depth ; k++)
-            for (int i = 0; i < inputAmount; i++)
-                for (int j = 0; j < innerAmount; j++)
-                    innerLayers[k][i][j] = r.nextGaussian() - 1;
+        for (int k = 0; k < NETWORK_DEPTH; k++)
+            for (int i = 0; i < innerSize; i++)
+                for (int j = 0; j < innerSize; j++)
+                    innerLayers[k][i][j] = r.nextGaussian() / 2;
 
-        for (int i = 0; i < innerAmount; i++)
-            for (int j = 0; j < outputAmount; j++)
-                outputLayer[i][j] = r.nextGaussian() - 1;
+        for (int i = 0; i < innerSize; i++)
+            for (int j = 0; j < outputSize; j++)
+                outputLayer[i][j] = r.nextGaussian() / 2;
     }
 
-    public NeuralNetwork(int inputAmount, int outputAmount, Genotype genotype) {
-        this.inputAmount = inputAmount;
-        innerAmount = (inputAmount + outputAmount) / 2;
-        this.outputAmount = outputAmount;
+    public NeuralNetwork(int inputSize, int outputSize, Genotype genotype) {
+        this.inputSize = inputSize;
+        innerSize = (inputSize + outputSize) / 2;
+        this.outputSize = outputSize;
 
-        inputLayer = new double[inputAmount][innerAmount];
-        System.out.println(inputLayer.length);
-        System.out.println(inputLayer[0].length);
-        System.out.println(inputLayer);
+        inputLayer = new double[inputSize][innerSize];
+        innerLayers = new double[NETWORK_DEPTH][innerSize][innerSize];
+        outputLayer = new double[innerSize][outputSize];
 
-        innerLayers = new double[depth - 1][innerAmount][innerAmount];
-        System.out.println(innerLayers.length);
-        //System.out.println(innerLayers[0].length);
-        //System.out.println(innerLayers[0][0].length);
-        System.out.println(innerLayers);
-
-        outputLayer = new double[innerAmount][outputAmount];
-        System.out.println(outputLayer.length);
-        System.out.println(outputLayer[0].length);
-        System.out.println(outputLayer);
-
-        short[] shorts = genotype.getGenes();
+        int[] genes = genotype.getGenes();
         int index = 0;
-        for (int i = 0; i < inputAmount; i++)
-            for (int j = 0; j < innerAmount; j++)
-                inputLayer[i][j] = gCToDouble(shorts[index++]);
-        for (int k = 0; k < depth ; k++)
-            for (int i = 0; i < inputAmount; i++)
-                for (int j = 0; j < innerAmount; j++)
-                    innerLayers[k][i][j] = gCToDouble(shorts[index++]);
+        for (int i = 0; i < inputSize; i++)
+            for (int j = 0; j < innerSize; j++)
+                inputLayer[i][j] = gCToDouble(genes[index++]);
 
-        for (int i = 0; i < innerAmount; i++)
-            for (int j = 0; j < outputAmount; j++)
-                outputLayer[i][j] = gCToDouble(shorts[index++]);
+        for (int k = 0; k < NETWORK_DEPTH ; k++)
+            for (int i = 0; i < innerSize; i++)
+                for (int j = 0; j < innerSize; j++)
+                    innerLayers[k][i][j] = gCToDouble(genes[index++]);
+
+        for (int i = 0; i < innerSize; i++)
+            for (int j = 0; j < outputSize; j++)
+                outputLayer[i][j] = gCToDouble(genes[index++]);
     }
 
     public Genotype genotype() {
-        short[] shorts = new short[inputAmount * innerAmount +
-                innerAmount * innerAmount * (depth ) + innerAmount * outputAmount];
+        int genesAmount = inputSize * innerSize + innerSize * innerSize * (NETWORK_DEPTH) + innerSize * outputSize;
+        int[] genes = new int[genesAmount];
         int index = 0;
-        for (int i = 0; i < inputAmount; i++)
-            for (int j = 0; j < innerAmount; j++)
-                shorts[index++] = doubleToGC(inputLayer[i][j]);
+        for (int i = 0; i < inputSize; i++)
+            for (int j = 0; j < innerSize; j++)
+                genes[index++] = doubleToGC(inputLayer[i][j]);
 
-        for (int k = 0; k < depth ; k++)
-            for (int i = 0; i < inputAmount; i++)
-                for (int j = 0; j < innerAmount; j++)
-                    shorts[index++] = doubleToGC(innerLayers[k][i][j]);
+        for (int k = 0; k < NETWORK_DEPTH ; k++)
+            for (int i = 0; i < innerSize; i++)
+                for (int j = 0; j < innerSize; j++)
+                    genes[index++] = doubleToGC(innerLayers[k][i][j]);
 
-        for (int i = 0; i < innerAmount; i++)
-            for (int j = 0; j < outputAmount; j++)
-                shorts[index++] = doubleToGC(outputLayer[i][j]);
+        for (int i = 0; i < innerSize; i++)
+            for (int j = 0; j < outputSize; j++)
+                genes[index++] = doubleToGC(outputLayer[i][j]);
 
-        return new Genotype(shorts);
+        return new Genotype(genes);
     }
 
     public double[] calculate(double[] input) {
-        return null; //TODO
+        double[] valuesInp = new double[inputSize];
+        for (int i = 0; i < inputSize; i++)
+            valuesInp[i] = activationF(input[i]);
+
+        double[][] valuesInnInn = new double[2][innerSize];
+        for (int i = 0; i < innerSize; i++) {
+            double sum = 0;
+            for (int j = 0; j < inputSize; j++)
+                sum += valuesInp[j] * inputLayer[j][i];
+            valuesInnInn[0][i] = activationF(sum);
+        }
+
+        int innInnIndex = 0;
+        for (; innInnIndex < NETWORK_DEPTH; innInnIndex++) {
+            int from = innInnIndex % 2;
+            int to = 1 - from;
+
+            for (int i = 0; i < innerSize; i++) {
+                double sum = 0;
+                for (int j = 0; j < innerSize; j++)
+                    sum += valuesInnInn[from][j] * innerLayers[innInnIndex][j][i];
+                valuesInnInn[to][i] = activationF(sum);
+            }
+        }
+
+        int from = innInnIndex % 2;
+        double[] result = new double[outputSize];
+        for (int i = 0; i < outputSize; i++) {
+            double sum = 0;
+            for (int j = 0; j < innerSize; j++)
+                sum += valuesInnInn[from][j] * outputLayer[j][i];
+            result[i] = activationF(sum);
+        }
+
+        return result;
+    }
+
+    /**
+     * sigma
+     */
+    private static double activationF(double x) {
+        return 1 / (1 + Math.exp(-SIGMA_COEFFICIENT * x));
     }
 }

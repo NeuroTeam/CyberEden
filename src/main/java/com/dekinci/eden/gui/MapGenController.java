@@ -63,17 +63,13 @@ public class MapGenController {
 
     private boolean isUp, isDown, isRight, isLeft;
 
-    private enum MoveDirection {
-        UP, DOWN, LEFT, RIGHT
-    }
-
     @FXML
     public void initialize() {
-        bindLabelAndSlider(100, "%.0f", sizeSlider, sizeLabel);
+        bindLabelAndSlider(10, "%.0f", sizeSlider, sizeLabel);
 
-        bindLabelAndSlider(0.5, "%2.2f", thresholdSlider, thresholdLabel);
-        bindLabelAndSlider(1, "%2.2f", powerSlider, powerLabel);
-        bindLabelAndSlider(1, "%2.2f", distanceCSlider, distanceLabel);
+        bindLabelAndSlider(0.4, "%2.2f", thresholdSlider, thresholdLabel);
+        bindLabelAndSlider(4, "%2.2f", powerSlider, powerLabel);
+        bindLabelAndSlider(0.75, "%2.2f", distanceCSlider, distanceLabel);
 
         saveButton.setOnMouseClicked(event -> new SaveHandler().execute());
         generate.setOnMouseClicked(event -> new GenerationHandler().execute());

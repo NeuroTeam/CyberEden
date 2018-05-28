@@ -1,12 +1,7 @@
 package com.dekinci.eden.model.animal.ai;
 
-import com.dekinci.eden.model.animal.Animal;
 import com.dekinci.eden.model.animal.Decisions;
-import com.dekinci.eden.model.animal.Hare;
-import com.dekinci.eden.model.animal.Wolf;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class GenotypeTest {
 

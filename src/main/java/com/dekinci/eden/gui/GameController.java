@@ -29,10 +29,6 @@ import java.util.TimerTask;
 
 
 public class GameController {
-    private enum MoveDirection {
-        UP, DOWN, LEFT, RIGHT
-    }
-
     @FXML
     Pane worldPane;
 
@@ -99,7 +95,7 @@ public class GameController {
         tickButton.setOnMouseClicked(e -> fireTick());
         autotickButton.setOnAction(event -> {
             if (clickTimer == null) {
-                clickTimer = new Timer();
+                clickTimer = new Timer(true);
                 clickTimer.scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {

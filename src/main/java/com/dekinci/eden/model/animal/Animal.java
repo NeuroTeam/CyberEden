@@ -17,6 +17,7 @@ public interface Animal {
     int getAge();
 
     void incSatiety();
+    int getAmountOfBabies();
 
     byte makeDecision(AnimalVision view);
     Animal breed(Animal animal);

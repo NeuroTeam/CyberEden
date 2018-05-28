@@ -14,7 +14,10 @@ public class Brain {
     }
 
     public Brain breed(Brain brain) {
-        return new Brain(neuralNetwork.genotype().breed(brain.neuralNetwork.genotype()));
+        Genotype genotype = neuralNetwork.genotype().breed(brain.neuralNetwork.genotype());
+        if (genotype != null)
+            return new Brain();
+        else return null;
     }
 
     public byte makeDecision(AnimalVision view) {

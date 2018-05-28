@@ -1,8 +1,6 @@
 package com.dekinci.eden.model.world;
 
 import com.dekinci.eden.model.animal.Animal;
-import com.dekinci.eden.model.animal.Hare;
-import com.dekinci.eden.model.animal.Wolf;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

@@ -6,13 +6,12 @@ import com.dekinci.eden.model.animal.ai.Genotype;
 
 import java.util.Random;
 
+import static com.dekinci.eden.model.Settings.*;
+
 
 public class Wolf implements Animal {
-    private static final int SIGHT = 2;
-    private static final int FULL_SATIETY = 20;
-
-    private int satiety = 10;
-    private int hp = 100;
+    private int satiety = WOLF_INIT_SATIETY;
+    private int hp = WOLF_INIT_HP;
     private int age;
 
     private Brain brain;
@@ -76,14 +75,14 @@ public class Wolf implements Animal {
 
     @Override
     public void incSatiety() {
-        if (satiety < FULL_SATIETY)
+        if (satiety < WOLF_FULL_SATIETY)
             satiety++;
     }
 
     @Override
     public byte makeDecision(AnimalVision view) {
-//        return brain.makeDecision(view);
-        return (byte) new Random().nextInt(11);
+        return brain.makeDecision(view);
+//        return (byte) new Random().nextInt(11);
     }
 
     @Override
@@ -93,16 +92,26 @@ public class Wolf implements Animal {
 
     @Override
     public Animal breed(Animal animal) {
-        if (!(animal instanceof Wolf))
-            throw new IllegalStateException("Wrong breed type");
-        Wolf wolf = (Wolf) animal;
+        if (animal.getSpecies() != getSpecies() || animal == this)
+            return null;
 
-        return new Wolf(brain.breed(wolf.brain));
+        Wolf wolf = (Wolf) animal;
+        System.out.println("Breeding " + toString() + " on " + animal.toString());
+        Brain newBrain = brain.breed(wolf.brain);
+        if (brain != null)
+            return new Wolf(newBrain);
+        else
+            return null;
+    }
+
+    @Override
+    public int getAmountOfBabies() {
+        return new Random().nextInt(4) + 2;
     }
 
     @Override
     public int getSight() {
-        return SIGHT;
+        return WOLF_SIGHT;
     }
 
     @Override

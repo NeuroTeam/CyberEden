@@ -6,12 +6,11 @@ import com.dekinci.eden.model.animal.ai.Genotype;
 
 import java.util.Random;
 
-public class Hare implements Animal {
-    private static final int SIGHT = 2;
-    private static final int FULL_SATIETY = 10;
+import static com.dekinci.eden.model.Settings.*;
 
-    private int satiety = 10;
-    private int hp = 10;
+public class Hare implements Animal {
+    private int satiety = HARE_INIT_SATIETY;
+    private int hp = HARE_INIT_HP;
     private int age;
 
     private Brain brain;
@@ -26,8 +25,8 @@ public class Hare implements Animal {
 
     @Override
     public byte makeDecision(AnimalVision view) {
-//        return brain.makeDecision(view);
-        return (byte) new Random().nextInt(11);
+        return brain.makeDecision(view);
+//        return (byte) new Random().nextInt(11);
     }
 
     @Override
@@ -45,8 +44,13 @@ public class Hare implements Animal {
     }
 
     @Override
+    public int getAmountOfBabies() {
+        return new Random().nextInt(5) + 4;
+    }
+
+    @Override
     public int getSight() {
-        return SIGHT;
+        return HARE_SIGHT;
     }
 
     @Override
@@ -86,17 +90,21 @@ public class Hare implements Animal {
 
     @Override
     public void incSatiety() {
-        if (satiety < FULL_SATIETY)
+        if (satiety < HARE_FULL_SATIETY)
             satiety++;
     }
 
     @Override
     public Animal breed(Animal animal) {
-        if (!(animal instanceof Hare))
-            throw new IllegalStateException("Wrong breed type");
+        if (animal.getSpecies() != getSpecies() || animal == this)
+            return null;
         Hare hare = (Hare) animal;
-
-        return new Hare(brain.breed(hare.brain));
+        System.out.println("Breeding " + toString() + " on " + animal.toString());
+        Brain newBrain = brain.breed(hare.brain);
+        if (brain != null)
+            return new Hare(newBrain);
+        else
+            return null;
     }
 
     @Override

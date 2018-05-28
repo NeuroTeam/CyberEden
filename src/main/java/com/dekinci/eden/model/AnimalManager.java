@@ -15,14 +15,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
+import static com.dekinci.eden.model.Settings.HARE_SPAWN_RATE;
+import static com.dekinci.eden.model.Settings.WOLF_SPAWN_RATE;
 import static com.dekinci.eden.model.animal.Decisions.*;
 import static com.dekinci.eden.model.animal.Decisions.DO_NOTHING;
 import static java.lang.Math.*;
 
 public class AnimalManager {
-    private static final double WOLF_SPAWN_RATE = 0.005;
-    private static final double HARE_SPAWN_RATE = 0.05;
-
     private Map<Coordinate, Cell> activeCells = new ConcurrentHashMap<>();
     private Map<Coordinate, Cell> animalTransaction = new ConcurrentHashMap<>();
 
@@ -119,33 +118,38 @@ public class AnimalManager {
 
     private void breed(Animal animal, Cell cell, Coordinate c) {
         Animal partner = cell.getOther(animal);
-        if (partner != null) {
-            Animal baby = partner.breed(animal);
-            boolean placed = false;
-            Coordinate finalPlace = c;
-            for (int i = 0; i < 5; i++) {
-                Coordinate toPlace = c.randomAround();
-                Cell bc = activeCells.get(toPlace);
-                if (bc == null) {
-                    bc = new Cell();
-                    newCellInTransaction(toPlace, bc);
+        if (partner != null && partner.getSpecies() == animal.getSpecies() ) {
+            int amountOfBabies = animal.getAmountOfBabies();
+            for (int k = 0; k < amountOfBabies; k++) {
+                Animal baby = partner.breed(animal);
+                if (baby == null)
+                    return;
+                boolean placed = false;
+                Coordinate finalPlace = c;
+                for (int i = 0; i < 5; i++) {
+                    Coordinate toPlace = c.randomAround();
+                    Cell bc = activeCells.get(toPlace);
+                    if (bc == null) {
+                        bc = new Cell();
+                        newCellInTransaction(toPlace, bc);
+                    }
+                    if (bc.add(baby)) {
+                        placed = true;
+                        finalPlace = toPlace;
+                        break;
+                    }
                 }
-                if (bc.add(baby)) {
-                    placed = true;
-                    finalPlace = toPlace;
-                    break;
+
+                if (!placed) {
+                    animal.die();
+                    cell.remove(animal);
+                    cell.add(baby);
+                    finalPlace = c;
                 }
-            }
 
-            if (!placed) {
-                cell.remove(animal);
-                animal.die();
-                cell.add(baby);
-                finalPlace = c;
+                if (!BlockManager.isSolid(worldMap.get(finalPlace)))
+                    baby.die();
             }
-
-            if (!BlockManager.isSolid(worldMap.get(finalPlace)))
-                baby.die();
         }
     }
 

@@ -1,5 +1,7 @@
 package com.dekinci.eden.model.world.blocks;
 
+import java.util.Random;
+
 public class GrassBlock {
     private final static byte[] states = {
             BlockManager.GRASS_0_BLOCK_ID,
@@ -17,7 +19,7 @@ public class GrassBlock {
     }
 
     public static byte getYoung() {
-        return states[0];
+        return states[new Random().nextInt(3)];
     }
 
     public static byte grow(byte id) {
