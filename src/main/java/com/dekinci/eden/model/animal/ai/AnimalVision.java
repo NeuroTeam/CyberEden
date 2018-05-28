@@ -1,19 +1,13 @@
 package com.dekinci.eden.model.animal.ai;
 
+import static com.dekinci.eden.model.Settings.*;
+
 public class AnimalVision {
-    public static final int VISION_POINTS_PER_TYPE = 8;
-    public static final int VISION_TYPES = 5;
-    public static final int VISION_POINTS = VISION_POINTS_PER_TYPE * VISION_TYPES;
-
-
     private double[] grass;
     private double[] hares;
     private double[] wolfes;
     private double[] land;
     private double[] water;
-
-    public AnimalVision() {
-    }
 
     public AnimalVision(double[] grass, double[] hares, double[] wolfes, double[] land, double[] water) {
         this.grass = grass;

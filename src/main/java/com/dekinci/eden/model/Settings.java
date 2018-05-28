@@ -4,6 +4,10 @@ public class Settings {
     public static double SIGMA_COEFFICIENT = 1;
     public static int NETWORK_DEPTH = 1;
 
+    public static final int VISION_POINTS_PER_TYPE = 8;
+    public static final int VISION_TYPES = 5;
+    public static final int VISION_POINTS = VISION_POINTS_PER_TYPE * VISION_TYPES;
+
     public static Double MUTATION_RATE = 0.05;
 
     public static double WOLF_SPAWN_RATE = 0.02;
