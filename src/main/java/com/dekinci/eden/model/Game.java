@@ -1,7 +1,6 @@
 package com.dekinci.eden.model;
 
 import com.dekinci.eden.model.world.Coordinate;
-import com.dekinci.eden.model.world.Season;
 import com.dekinci.eden.model.world.WorldMap;
 import com.dekinci.eden.model.world.blocks.BlockManager;
 import com.dekinci.eden.model.world.blocks.GrassBlock;
@@ -26,7 +25,7 @@ public class Game {
     private AnimalManager animalManager;
     private int state = STATE_NOT_READY;
 
-    private static final int yearLength = 400;
+    private static final int yearLength = 100;
     private static final int periodLength = yearLength / 4;
 
     public void tick() {
@@ -42,8 +41,8 @@ public class Game {
         return day;
     }
 
-    public Season getSeason() {
-        return Season.getById(day / periodLength);
+    public double getYearProgress() {
+        return (day % yearLength) / (double) yearLength;
     }
 
     private void grassTick() {
@@ -53,26 +52,26 @@ public class Game {
         Coordinate.foreachInRectangle(s, worldMap.getSizeInBlocks(), worldMap.getSizeInBlocks(), c -> {
             byte id = worldMap.get(c);
             if (GrassBlock.isGrass(id) && GrassBlock.stateById(id) != GrassBlock.maxState()) {
-                if (r.nextDouble() < GRASS_SHRINK_RATE * getGrassMultiplier())
+                if (r.nextDouble() * getGrassMultiplier() < GRASS_SHRINK_RATE)
                     worldMap.set(c, GrassBlock.shrink(id));
 
-                if (r.nextDouble() < GRASS_GROW_RATE * getGrassMultiplier())
+                if (r.nextDouble() * getGrassMultiplier() < GRASS_GROW_RATE)
                     worldMap.set(c, GrassBlock.grow(id));
 
-                if (worldMap.get(c.downTo()) == BlockManager.LAND_BLOCK_ID * getGrassMultiplier())
-                    if (r.nextDouble() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
+                if (worldMap.get(c.downTo()) == BlockManager.LAND_BLOCK_ID)
+                    if (r.nextDouble() * getGrassMultiplier() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
                         worldMap.set(c.downTo(), GrassBlock.getYoung());
 
-                if (worldMap.get(c.upTo()) == BlockManager.LAND_BLOCK_ID * getGrassMultiplier())
-                    if (r.nextDouble() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
+                if (worldMap.get(c.upTo()) == BlockManager.LAND_BLOCK_ID)
+                    if (r.nextDouble() * getGrassMultiplier() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
                         worldMap.set(c.upTo(), GrassBlock.getYoung());
 
-                if (worldMap.get(c.rightTo()) == BlockManager.LAND_BLOCK_ID * getGrassMultiplier())
-                    if (r.nextDouble() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
+                if (worldMap.get(c.rightTo()) == BlockManager.LAND_BLOCK_ID)
+                    if (r.nextDouble() * getGrassMultiplier() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
                         worldMap.set(c.rightTo(), GrassBlock.getYoung());
 
-                if (worldMap.get(c.leftTo()) == BlockManager.LAND_BLOCK_ID * getGrassMultiplier())
-                    if (r.nextDouble() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
+                if (worldMap.get(c.leftTo()) == BlockManager.LAND_BLOCK_ID)
+                    if (r.nextDouble() * getGrassMultiplier() < GRASS_SPREAD_RATE * GrassBlock.stateById(id))
                         worldMap.set(c.leftTo(), GrassBlock.getYoung());
             }
         });
@@ -106,6 +105,7 @@ public class Game {
 
     private void addGrass() {
         int size = worldMap.getSizeInBlocks();
+        worldMap.set(new Coordinate(0, 0), GrassBlock.getYoung());
         Random r = new Random();
 
         final AtomicInteger counter = new AtomicInteger();

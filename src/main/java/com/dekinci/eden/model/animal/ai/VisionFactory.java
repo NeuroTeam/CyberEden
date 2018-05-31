@@ -6,7 +6,7 @@ import com.dekinci.eden.model.world.Coordinate;
 import com.dekinci.eden.model.world.WorldMap;
 import com.dekinci.eden.model.world.blocks.GrassBlock;
 
-import static com.dekinci.eden.model.animal.ai.AnimalVision.VISION_POINTS_PER_TYPE;
+import static com.dekinci.eden.model.Settings.VISION_POINTS_PER_TYPE;
 import static java.lang.Math.*;
 
 public class VisionFactory {

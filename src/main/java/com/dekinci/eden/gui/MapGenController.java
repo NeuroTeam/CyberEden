@@ -116,11 +116,8 @@ public class MapGenController {
         if (worldMap == null)
             return;
 
-        int width = (int) worldPane.getWidth();
-        int height = (int) worldPane.getHeight();
-
-        mapCanvas.setWidth(width);
-        mapCanvas.setHeight(height);
+        mapCanvas.setWidth(worldPane.getWidth());
+        mapCanvas.setHeight(worldPane.getHeight());
     }
 
     private void bindLabelAndSlider(double def, String format, Slider slider, Label label) {
@@ -198,8 +195,8 @@ public class MapGenController {
     }
 
     private void draw() {
-        int w = (int) worldPane.getWidth() / tileRes;
-        int h = (int) worldPane.getHeight() / tileRes;
+        int w = (int) worldPane.getWidth() / tileRes + 2;
+        int h = (int) worldPane.getHeight() / tileRes + 2;
 
         Coordinate start = new Coordinate(center.getX() - w / 2, center.getY() - h / 2);
 

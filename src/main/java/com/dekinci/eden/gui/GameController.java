@@ -20,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.Effect;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -73,8 +74,6 @@ public class GameController {
     private double mouseX, mouseY;
     private boolean isUp, isDown, isRight, isLeft;
 
-    private Effect seasonEffect = game.getSeason().getRelatedEffect();
-
     @FXML
     public void initialize() {
         worldPane.widthProperty().addListener((observable, oldValue, newValue) -> resizeAndDraw());
@@ -110,7 +109,6 @@ public class GameController {
             }
         });
 
-        worldMap.set(new Coordinate(0, 0), GrassBlock.getYoung());
         GraphicsContext context = minimapCanvas.getGraphicsContext2D();
         context.drawImage(SwingFXUtils.toFXImage(worldMap.toImage(), null), 0, 0,
                 minimapCanvas.getWidth(), minimapCanvas.getHeight());
@@ -119,8 +117,8 @@ public class GameController {
     }
 
     private void calculateCurrentCoordinate(boolean force) {
-        int w = (int) worldPane.getWidth() / tileRes;
-        int h = (int) worldPane.getHeight() / tileRes;
+        int w = (int) worldPane.getWidth() / tileRes + 2;
+        int h = (int) worldPane.getHeight() / tileRes + 2;
 
         int sX = center.getX() - w / 2;
         int sY = center.getY() - h / 2;
@@ -129,7 +127,7 @@ public class GameController {
         sY += (int) mouseY / tileRes;
 
         Coordinate s = new Coordinate(sX, sY);
-        if (!activeCoordinate.equals(s) || force) {
+        if (force || !activeCoordinate.equals(s)) {
             activeCoordinate = s;
             CoordinateInfo info = game.getCoordinateInfo(s);
             viewCoordinate.setText(activeCoordinate.toString());
@@ -152,16 +150,13 @@ public class GameController {
             tickLabel.setText(String.valueOf(game.getDay()));
             System.out.println("Tick");
 
-            Effect se = game.getSeason().getRelatedEffect();
-            if (se != null && !se.equals(seasonEffect)) {
-                seasonEffect = se;
-                updateEffect();
-            }
+            updateEffect();
         });
     }
 
     private void updateEffect() {
-//        mapCanvas.setEffect(seasonEffect); //TODO
+        Effect e = new ColorAdjust(getHue(), getSaturation(), getBrightness(), 0);
+        mapCanvas.setEffect(e);
     }
 
     private void handlePressed(KeyEvent event) {
@@ -242,13 +237,8 @@ public class GameController {
         if (worldMap == null)
             return;
 
-        int width = (int) worldPane.getWidth();
-        int height = (int) worldPane.getHeight();
-
-        System.out.println(width + "x" + height);
-
-        mapCanvas.setWidth(width);
-        mapCanvas.setHeight(height);
+        mapCanvas.setWidth(worldPane.getWidth());
+        mapCanvas.setHeight(worldPane.getHeight());
         calculateCurrentCoordinate(false);
     }
 
@@ -258,8 +248,8 @@ public class GameController {
     }
 
     private void draw() {
-        int w = (int) worldPane.getWidth() / tileRes;
-        int h = (int) worldPane.getHeight() / tileRes;
+        int w = (int) worldPane.getWidth() / tileRes + 2;
+        int h = (int) worldPane.getHeight() / tileRes + 2;
 
         Coordinate start = new Coordinate(center.getX() - w / 2, center.getY() - h / 2);
         if (worldMap != null)
@@ -283,9 +273,20 @@ public class GameController {
                         relative.getX() * tileRes, relative.getY() * tileRes, tileRes, tileRes);
     }
 
-
     @FXML
     private void toMenu(ActionEvent event) {
         App.getApp().toMainMenu();
+    }
+
+    private double getHue() {
+        return 0.2 * Math.cos(Math.PI * (2 * game.getYearProgress() - 0.125));
+    }
+
+    private double getSaturation() {
+        return 0.2 * Math.cos(Math.PI * (2 * game.getYearProgress() - 0.325));
+    }
+
+    private double getBrightness() {
+        return 0.2 * Math.cos(Math.PI * (2 * game.getYearProgress() - 0.325));
     }
 }

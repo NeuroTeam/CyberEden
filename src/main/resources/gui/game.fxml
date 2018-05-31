@@ -94,7 +94,7 @@
                   <ListView fx:id="viewEntitiesList" prefHeight="100.0" prefWidth="150.0" />
                </children>
             </VBox>
-            <HBox alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <HBox alignment="CENTER" pickOnBounds="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                <children>
                   <Button fx:id="tickButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" text="TICK">
                      <HBox.margin>
