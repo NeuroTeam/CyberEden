@@ -6,6 +6,8 @@ import com.dekinci.eden.model.world.blocks.BlockManager;
 import com.dekinci.eden.model.world.blocks.GrassBlock;
 
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.dekinci.eden.model.Settings.*;
@@ -19,7 +21,7 @@ public class Game {
     public static final int STATE_STOPPING = 5;
     public static final int STATE_STOPPED = 6;
 
-    private int day = 1;
+    private final AtomicInteger day = new AtomicInteger(1);
 
     private WorldMap worldMap;
     private AnimalManager animalManager;
@@ -32,17 +34,24 @@ public class Game {
         if (state != STATE_RUNNING)
             return;
 
-        grassTick();
-        animalManager.tick();
-        day++;
+        Future grass = Worker.getWorker().submit(this::grassTick);
+        Future animals = Worker.getWorker().submit(animalManager::tick);
+        day.getAndIncrement();
+        try {
+            grass.get();
+            animals.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public int getDay() {
-        return day;
+        return day.get();
     }
 
     public double getYearProgress() {
-        return (day % yearLength) / (double) yearLength;
+        return (day.get() % yearLength) / (double) yearLength;
     }
 
     private void grassTick() {
@@ -117,6 +126,6 @@ public class Game {
     }
 
     private double getGrassMultiplier() {
-        return 0.5 + Math.cos(Math.PI * (2 * ((periodLength + day) % yearLength) / (double) yearLength - 1) / 2);
+        return 0.75 + Math.cos(Math.PI * (2 * ((periodLength + day.get()) % yearLength) / (double) yearLength - 1) / 2);
     }
 }

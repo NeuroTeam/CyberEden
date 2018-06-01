@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.awt.color.ColorSpace.TYPE_RGB;
 
@@ -17,16 +18,10 @@ import static java.awt.color.ColorSpace.TYPE_RGB;
  */
 public class WorldMap {
     private Map<Integer, Chunk> chunkMap;
-    private int sizeInBlocks;
-    private int sizeInChunks;
-    private int radiusInChunks;
-    private int radiusInBlocks;
+    private final AtomicInteger sizeInBlocks = new AtomicInteger();
 
     public WorldMap(int sizeInChunks) {
-        this.sizeInChunks = sizeInChunks;
-        this.sizeInBlocks = sizeInChunks * Chunk.SIZE;
-        radiusInBlocks = sizeInBlocks / 2;
-        radiusInChunks = sizeInChunks / 2;
+        this.sizeInBlocks.set(sizeInChunks * Chunk.SIZE);
 
         chunkMap = new ConcurrentHashMap<>(sizeInChunks * sizeInChunks);
     }
@@ -45,7 +40,7 @@ public class WorldMap {
     }
 
     public int getSizeInBlocks() {
-        return sizeInBlocks;
+        return sizeInBlocks.get();
     }
 
     public boolean isBlock(Coordinate coordinate, byte block) {

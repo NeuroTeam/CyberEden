@@ -49,6 +49,10 @@ public class WorldGenerator {
     public WorldGenerator generateRandomEarth(double threshold, double power, double distanceCoeff) {
         //sparse(threshold, power, distanceCoeff, generatingWorld, new Coordinate(0, 0), landFactory);
         sparse(threshold, power, distanceCoeff, new Coordinate(0, 0), BlockManager.LAND_BLOCK_ID);
+        fill((x, y) -> {
+            int rad = (int) Math.round(Math.sqrt(x * x + y * y));
+            return rad >= radiusBlock - 2 && rad < radiusBlock ? BlockManager.WATER_BLOCK_ID : null;
+        });
         return this;
     }
 
