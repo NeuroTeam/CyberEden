@@ -116,6 +116,6 @@ public class Wolf implements Animal {
 
     @Override
     public String toString() {
-        return "Woof Wolf";
+        return "Wolf " + brain.toString();
     }
 }

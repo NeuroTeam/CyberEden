@@ -1,0 +1,368 @@
+@startuml
+
+title __EDEN's Class Diagram__\n
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.animal {
+        interface Animal {
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      class AnimalManager {
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.animal {
+        class AnimalTypes {
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.animal {
+        package com.dekinci.eden.model.animal.ai {
+          class AnimalVision {
+          }
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    class App {
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.utils {
+      abstract class AsyncTask {
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.world {
+        package com.dekinci.eden.model.world.blocks {
+          class BlockManager {
+          }
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.animal {
+        package com.dekinci.eden.model.animal.ai {
+          class Brain {
+          }
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.utils {
+      interface Callback {
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.world {
+        class Cell {
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.world {
+        class Chunk {
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.world {
+        class Coordinate {
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      class CoordinateInfo {
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.animal {
+        class Decisions {
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.animal {
+        package com.dekinci.eden.model.animal.ai {
+          class DoubleToGrayCode {
+          }
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.utils {
+      interface FactCallback {
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      class Game {
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.gui {
+      class GameController {
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.animal {
+        package com.dekinci.eden.model.animal.ai {
+          class Genotype {
+          }
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.world {
+        package com.dekinci.eden.model.world.blocks {
+          class GrassBlock {
+          }
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.animal {
+        class Hare {
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.gui {
+      class MainMenuController {
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.gui {
+      class MapGenController {
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.animal {
+        package com.dekinci.eden.model.animal.ai {
+          class NeuralNetwork {
+          }
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.utils {
+      interface ResultCallback {
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      class Settings {
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.world {
+        class Spiral {
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.gui {
+      class TextureManager {
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.utils {
+      class Utils {
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.animal {
+        package com.dekinci.eden.model.animal.ai {
+          class VisionFactory {
+          }
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.animal {
+        class Wolf {
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      class Worker {
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.world {
+        package com.dekinci.eden.model.world.generation {
+          class WorldGenerator {
+          }
+        }
+      }
+    }
+  }
+  
+
+  package com.dekinci.eden {
+    package com.dekinci.eden.model {
+      package com.dekinci.eden.model.world {
+        class WorldMap {
+        }
+      }
+    }
+  }
+  
+
+  AnimalManager o-- WorldMap : worldMap
+  App -up-|> Application
+  App o-- Game : game
+  Brain o-- NeuralNetwork : neuralNetwork
+  Cell -up-|> Iterable
+  Cell o-- Animal : a1
+  Cell o-- Animal : a2
+  CoordinateInfo o-- Coordinate : coordinate
+  CoordinateInfo o-- Cell : cell
+  Game o-- WorldMap : worldMap
+  Game o-- AnimalManager : animalManager
+  GameController o-- Game : game
+  GameController o-- WorldMap : worldMap
+  GameController o-- AnimalManager : animalManager
+  GameController o-- Coordinate : activeCoordinate
+  GameController o-- Coordinate : center
+  Hare -up-|> Animal
+  Hare o-- Brain : brain
+  MapGenController o-- WorldMap : worldMap
+  MapGenController o-- Coordinate : center
+  VisionFactory o-- Coordinate : c
+  VisionFactory o-- WorldMap : worldMap
+  VisionFactory o-- AnimalManager : manager
+  Wolf -up-|> Animal
+  Wolf o-- Brain : brain
+  WorldGenerator o-- Coordinate : leftTop
+  WorldGenerator o-- Coordinate : rightBottom
+  WorldGenerator o-- WorldMap : generatingWorld
+
+
+right footer
+
+
+PlantUML diagram generated by SketchIt! (https://bitbucket.org/pmesmeur/sketch.it)
+For more information about this tool, please contact philippe.mesmeur@gmail.com
+endfooter
+
+@enduml

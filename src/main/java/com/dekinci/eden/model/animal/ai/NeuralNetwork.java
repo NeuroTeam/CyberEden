@@ -1,5 +1,6 @@
 package com.dekinci.eden.model.animal.ai;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import static com.dekinci.eden.model.Settings.NETWORK_DEPTH;
@@ -56,7 +57,7 @@ public class NeuralNetwork {
             for (int j = 0; j < innerSize; j++)
                 inputLayer[i][j] = gCToDouble(genes[index++]);
 
-        for (int k = 0; k < NETWORK_DEPTH ; k++)
+        for (int k = 0; k < NETWORK_DEPTH; k++)
             for (int i = 0; i < innerSize; i++)
                 for (int j = 0; j < innerSize; j++)
                     innerLayers[k][i][j] = gCToDouble(genes[index++]);
@@ -74,7 +75,7 @@ public class NeuralNetwork {
             for (int j = 0; j < innerSize; j++)
                 genes[index++] = doubleToGC(inputLayer[i][j]);
 
-        for (int k = 0; k < NETWORK_DEPTH ; k++)
+        for (int k = 0; k < NETWORK_DEPTH; k++)
             for (int i = 0; i < innerSize; i++)
                 for (int j = 0; j < innerSize; j++)
                     genes[index++] = doubleToGC(innerLayers[k][i][j]);
@@ -129,5 +130,24 @@ public class NeuralNetwork {
      */
     private static double activationF(double x) {
         return 1 / (1 + Math.exp(-SIGMA_COEFFICIENT * x));
+    }
+
+    @Override
+    public String toString() {
+        double hash = 0;
+        for (double[] l : inputLayer)
+            for (double d : l)
+                hash += d;
+
+        for (double[][] l : innerLayers)
+            for (double[] l2 : l)
+                for (double d : l2)
+                    hash += d;
+
+        for (double[] l : outputLayer)
+            for (double d : l)
+                hash += d;
+
+        return Long.toString((long) hash);
     }
 }

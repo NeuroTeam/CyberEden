@@ -16,7 +16,7 @@ public class Settings {
     public static double GRASS_SPAWN_RATE = 0.5;
     public static double GRASS_SPREAD_RATE = 0.05;
     public static double GRASS_GROW_RATE = 0.2;
-    public static double GRASS_SHRINK_RATE = 0.007;
+    public static double GRASS_SHRINK_RATE = 0.01;
 
 
     public static int WOLF_SIGHT = 2;

@@ -61,7 +61,7 @@ public class Game {
         Coordinate.foreachInRectangle(s, worldMap.getSizeInBlocks(), worldMap.getSizeInBlocks(), c -> {
             byte id = worldMap.get(c);
             if (GrassBlock.isGrass(id) && GrassBlock.stateById(id) != GrassBlock.maxState()) {
-                if (r.nextDouble() * getGrassMultiplier() < GRASS_SHRINK_RATE)
+                if (r.nextDouble() < GRASS_SHRINK_RATE * getGrassMultiplier())
                     worldMap.set(c, GrassBlock.shrink(id));
 
                 if (r.nextDouble() * getGrassMultiplier() < GRASS_GROW_RATE)
@@ -126,6 +126,6 @@ public class Game {
     }
 
     private double getGrassMultiplier() {
-        return 0.75 + Math.cos(Math.PI * (2 * ((periodLength + day.get()) % yearLength) / (double) yearLength - 1) / 2);
+        return 0.5 + Math.cos(Math.PI * (2 * ((periodLength + day.get()) % yearLength) / (double) yearLength - 1) / 2);
     }
 }

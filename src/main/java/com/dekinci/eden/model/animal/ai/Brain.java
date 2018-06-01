@@ -30,4 +30,9 @@ public class Brain {
 
         return iMax;
     }
+
+    @Override
+    public String toString() {
+        return neuralNetwork.toString();
+    }
 }

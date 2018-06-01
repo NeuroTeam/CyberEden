@@ -114,7 +114,7 @@ public class Hare implements Animal {
 
     @Override
     public String toString() {
-        return "Mr Hare";
+        return "Hare " + brain.toString();
     }
 }
 
